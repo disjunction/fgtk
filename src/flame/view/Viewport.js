@@ -10,10 +10,10 @@ var cc = require('cc');
  */
 function Viewport(opts) {
     this.opts = opts;
+    
+    this.nb = this.opts.nb;
 
     this.soundPlayer = null;
-
-    Viewport.superclass.constructor.call(this);
 
     this.scale = 1;
 
@@ -27,6 +27,15 @@ function Viewport(opts) {
 var _p = Viewport.prototype;
 
 _p.initLayers = function() {
+    this.scrolled = {
+        bg: this.nb.makeLayer({name: 'bg'}),
+        obstacle: this.nb.makeLayer({name: 'obstacle'}),
+        main: this.nb.makeLayer({name: 'main'}),
+        stuff: this.nb.makeLayer({name: 'stuff'}),
+        targets: this.nb.makeLayer({name: 'targets'})
+    };
+    
+    /*
     this.far = this.nf.makeNode();
     this.scrolled = this.nf.makeNode();
     this.hud = this.nf.makeNode();
@@ -39,13 +48,34 @@ _p.initLayers = function() {
     this.main = this.nf.makeNode(); this.scrolled.addChild(this.main);
     this.stuff = this.nf.makeNode(); this.scrolled.addChild(this.stuff);
     this.targets = this.nf.makeNode(); this.scrolled.addChild(this.targets);
+    */
 };
 
-_p.addChild = function(node, layerId) {
+_p.renderLayers = function() {
     if (this.opts.nb.type == 'fabric') {
-        this.opts.nb.type.addToCanvas(node);
+        for (var i in this.scrolled) {
+            this.scrolled[i].render(this.opts.nb);
+        }
+    } else {
+        throw new Error('implemented only for fabric');
     }
 };
+
+_p.addNodeToLayer = function(node, layerId) {
+    if (!layerId) {
+        layerId = 'main';
+        if (node.plan.layer) {
+            layerId = node.plan.layer;
+        }
+    }
+    this.scrolled[layerId].addChild(node);
+};
+
+_p.addNodeBunchToLayer = function(nodeBunch) {
+    for (var i in nodeBunch.nodes) {
+        this.addNodeToLayer(nodeBunch.nodes[i]);
+    }
+}
 
 _p.makeAnimator = function() {
     var Animator = require('./Animator');

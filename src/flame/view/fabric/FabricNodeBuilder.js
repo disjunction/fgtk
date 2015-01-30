@@ -1,10 +1,13 @@
 "use strict";
 
+var FabricLayer = require('flame/view/fabric/FabricLayer');
+
 var planMapping = {
     sprite: require('flame/view/fabric/plans/SpriteFabricNode')
 };
 
 var FabricNodeBuilder = function(opts) {
+    this.type = 'fabric';
     this.opts = opts || {};
     if (!this.opts.canvas) {
         throw new Error('FabricNodeBuilder requires opts.canvas (fabric canvas instance)');
@@ -40,6 +43,10 @@ _p.makeNode =  function(plan) {
     var node = builder.makeNode(plan);
     node.plan = plan;
     return node;
+};
+
+_p.makeLayer =  function(opts) {
+    return new FabricLayer(opts);
 };
 
 module.exports = FabricNodeBuilder;
