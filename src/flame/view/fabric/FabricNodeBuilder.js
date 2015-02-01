@@ -41,6 +41,7 @@ _p.makeNode =  function(plan) {
     var type = plan.type || 'sprite';
     var builder = this.getNodeBuilderByType(type);
     var node = builder.makeNode(plan);
+    node.planType = type;
     node.plan = plan;
     return node;
 };
