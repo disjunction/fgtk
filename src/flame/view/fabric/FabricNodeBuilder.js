@@ -38,10 +38,16 @@ _p.addToCanvas = function(node) {
 };
 
 _p.makeNode =  function(plan) {
-    var type = plan.type || 'sprite';
-    var builder = this.getNodeBuilderByType(type);
+    plan.type = plan.type || 'sprite';
+    var builder = this.getNodeBuilderByType(plan.type);
+    
+    // extend plan with defaults
+    if (builder.hydratePlan) {
+            builder.hydratePlan(plan);
+    }
+    
     var node = builder.makeNode(plan);
-    node.planType = type;
+    node.hasBorders = false;
     node.plan = plan;
     return node;
 };

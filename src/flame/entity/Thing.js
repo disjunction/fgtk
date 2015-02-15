@@ -34,21 +34,21 @@ var Thing = cc.Class.extend({
 		var old = this[property];
 				
 		if (old != newValue) {
-			this['_' + property] = newValue;
-			
-			// EventDispatcher
-			if (this.ed) {
-				if (delay) {
-					if (this['_' + property + 'Planned']) return newValue;
-					this['_' + property + 'Planned'] = true;
-					setTimeout((function(){
-						this.ed.dispatchProperty(this, property, old, this[property]);
-						this['_' + property + 'Planned'] = false;
-					}).bind(this), delay * 1000);
-				} else {
-					this.ed.dispatchProperty(this, property, old, newValue);
-				}
-			}
+                    this['_' + property] = newValue;
+
+                    // EventDispatcher
+                    if (this.ed) {
+                            if (delay) {
+                                    if (this['_' + property + 'Planned']) return newValue;
+                                    this['_' + property + 'Planned'] = true;
+                                    setTimeout((function(){
+                                            this.ed.dispatchProperty(this, property, old, this[property]);
+                                            this['_' + property + 'Planned'] = false;
+                                    }).bind(this), delay * 1000);
+                            } else {
+                                    this.ed.dispatchProperty(this, property, old, newValue);
+                            }
+                    }
 		}
 		
 		return newValue;

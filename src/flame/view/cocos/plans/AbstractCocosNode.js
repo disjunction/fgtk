@@ -2,7 +2,7 @@
 
 var cc = require('cc');
 
-var AbstractFabricNode = cc.Class.extend({
+var AbstractCocosNode = cc.Class.extend({
     ctor: function(opts) {
         this.opts = opts || {};
         
@@ -28,4 +28,4 @@ var AbstractFabricNode = cc.Class.extend({
     }
 });
 
-module.exports = AbstractFabricNode;
+module.exports = AbstractCocos;

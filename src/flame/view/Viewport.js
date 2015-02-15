@@ -8,21 +8,23 @@ var cc = require('cc');
  * * nb - node builder
  * @param opts
  */
-function Viewport(opts) {
-    this.opts = opts;
-    
-    this.nb = this.opts.nb;
+var Viewport = cc.Class.extend({
+    ctor: function(opts) {
+        this.opts = opts;
 
-    this.soundPlayer = null;
+        this.nb = this.opts.nb;
 
-    this.scale = 1;
+        this.soundPlayer = null;
 
-    // where does the camera look at?
-    this.point = cc.p(0, 0);
+        this.scale = 1;
 
-    // main cocos2d layer, see addLayersTo()
-    this.layer = null;
-}
+        // where does the camera look at?
+        this.point = cc.p(0, 0);
+
+        // main cocos2d layer, see addLayersTo()
+        this.layer = null;
+    }
+});
 
 var _p = Viewport.prototype;
 
@@ -52,13 +54,7 @@ _p.initLayers = function() {
 };
 
 _p.renderLayers = function() {
-    if (this.opts.nb.type == 'fabric') {
-        for (var i in this.scrolled) {
-            this.scrolled[i].render(this.opts.nb);
-        }
-    } else {
-        throw new Error('implemented only for fabric');
-    }
+    throw new Error('should be implemented only for fabric');
 };
 
 _p.addNodeToLayer = function(node, layerId) {
@@ -71,11 +67,11 @@ _p.addNodeToLayer = function(node, layerId) {
     this.scrolled[layerId].addChild(node);
 };
 
-_p.addNodeBunchToLayer = function(nodeBunch) {
-    for (var i in nodeBunch.nodes) {
-        this.addNodeToLayer(nodeBunch.nodes[i]);
+_p.addStateToLayer = function(state) {
+    for (var i in state.nodes) {
+        this.addNodeToLayer(state.nodes[i]);
     }
-}
+};
 
 _p.makeAnimator = function() {
     var Animator = require('./Animator');
@@ -122,7 +118,7 @@ _p.scaleCameraTo = function(scale, duration) {
  */
 _p.play = function(soundId, location) {
     if (this.soundPlayer) {
-            this.soundPlayer.play(soundId);
+        this.soundPlayer.play(soundId);
     }
 };
 
