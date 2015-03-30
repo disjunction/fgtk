@@ -14,13 +14,7 @@ var SpriteFabricNode = AbstractFabricNode.extend({
         var node = new this.fabric.Image(img);
         
         this.applyPlan(plan, node);
-        
-        var x = (typeof plan.x == 'undefined') ? - node.width / 2  : plan.x,
-            y = (typeof plan.y == 'undefined') ? - node.width / 2  : plan.y;
-        
-        node.setLeft(x);
-        node.setTop(y);
-        
+                
         return node;
     },
     
@@ -33,14 +27,22 @@ var SpriteFabricNode = AbstractFabricNode.extend({
             layer: node.layer,
             src: node.plan.src
         };
-        if (node.getLeft() != - node.width / 2) {
+        
+        
+        if (node.getLeft() != 0) {
             plan.x = this.roundCoord(node.getLeft());
         }
-        if (node.getTop() != - node.height / 2) {
-            plan.y = this.roundCoord(node.getTop());
+        if (node.getTop() != 0) {
+            plan.y = - this.roundCoord(node.getTop());
         }
         if (node.getAngle() != 0) {
             plan.a = this.roundAngle(node.getAngle());
+        }
+        if (node.getScaleX() != 1) {
+            plan.scaleX = this.roundScale(node.getScaleX());
+        }
+        if (node.getScaleY() != 1) {
+            plan.scaleY = this.roundScale(node.getScaleY());
         }
         return plan;
     }

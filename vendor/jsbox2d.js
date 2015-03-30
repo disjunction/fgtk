@@ -17,6 +17,7 @@ Function.prototype._implement = function(parent)
 {
 	return this._extend(parent);
 };
+
 Array.prototype.qsort = function(first, len, cmp)
 {
 	if (typeof(first) === 'undefined')
@@ -141,7 +142,7 @@ Array.prototype.rotate = function(first, n_first, last)
 };
 var b2Profiler = (function()
 {
-	if (typeof(performance) === 'undefined')
+	if (typeof(performance) === 'undefined' && typeof window != 'undefined')
 		window['performance'] = { now: function() { return +new Date(); } };
 
 	function profileStruct(name, parent)
@@ -1378,7 +1379,7 @@ b2Draw.e_frictionImpulses = 128;
 b2Draw.e_statistics = 256;
 b2Draw.e_profile = 512;
 b2Draw.e_pairBit = 1024;
-if (typeof(performance) === 'undefined' )
+if (typeof(performance) === 'undefined' && typeof window != 'undefined')
 {
 	window.performance = { now: function() { return +new Date(); } };
 }

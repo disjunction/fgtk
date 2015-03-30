@@ -1,0 +1,6 @@
+{
+    "name": "fgtk",
+    "dependencies": {
+        "exec-sync": "*"
+    }
+}

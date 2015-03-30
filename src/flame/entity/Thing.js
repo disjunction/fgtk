@@ -8,18 +8,22 @@ var
 
 var Thing = cc.Class.extend({
     /**
-     * @param mixed opts
+     * @param opts object
      */
     ctor: function(opts) {
-        if (typeof opts == 'string') {
-            this.type = opts;
-        } else if (typeof opts == 'object' && opts.type) {
-            this.type = opts.type;
-        }
-
-        this._l = ccp(0,0);
-        this._a = 0;
-        this.ac = true; // shows angle changed (recalc needed)
+        opts = opts || {};
+        
+        if (opts.plan) this.plan = opts.plan;
+        
+        // location
+        this.l = opts.l ? opts.l : cc.p(0, 0);
+        
+        // angle
+        this.a = opts.a ? opts.a : 0;
+        
+        // state
+        this.s = opts.s ? opts.s : 'basic';
+        
         this.nodes = {};
     },
     

@@ -24,6 +24,7 @@ _p.makeState = function(nodeBunchPlan, stateName) {
         var node = this.opts.nb.makeNode(plan);
         state.nodes[i] = node;
     }
+    state.name = stateName;
     return state;
 };
 

@@ -1,6 +1,11 @@
 module.exports = {
+    engine: {
+        FieldEngine: require('./engine/FieldEngine'),
+        BodyBuilder: require('./engine/BodyBuilder')
+    },
     entity: {
-        Thing: require('./entity/Thing')
+        Thing: require('./entity/Thing'),
+        Field: require('./entity/Field')
     },
     view: {
         Viewport: require('./view/Viewport'),
@@ -11,9 +16,14 @@ module.exports = {
         fabric: {
             FabricNodeBuilder: require('./view/fabric/FabricNodeBuilder'),
             FabricViewport: require('./view/fabric/FabricViewport')
+        },
+        cocos: {
+            CocosNodeBuilder: require('./view/cocos/CocosNodeBuilder'),
+            CocosViewport: require('./view/cocos/CocosViewport')
         }
     },
     service: {
-        CosmosManager: require('./service/CosmosManager')
+        CosmosManager: require('./service/CosmosManager'),
+        ThingPlanHelper: require('./service/ThingPlanHelper')
     }
 };

@@ -1,0 +1,11 @@
+{
+    "states" : {
+        "basic" : {
+            "main": {
+                "layer": "main",
+                "src": "unittest/placeholder_5x2.png"
+            }
+        }
+    },
+    "body" : "brick"
+}

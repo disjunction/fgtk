@@ -11,9 +11,14 @@ EventDispatcher.prototype.addListener = function (type, listener) {
 	this.listeners[type].push(listener);
 };
 
-EventDispatcher.prototype.dispatch = function(event){
+EventDispatcher.prototype.dispatch = function(event, extra){
 	if (typeof event == "string"){
-		event = { type: event };
+		event = {
+                    type: event
+                };
+                if (extra) {
+                    event.extra = extra;
+                }
 	}
 	if (!event.target){
 		event.target = this;
