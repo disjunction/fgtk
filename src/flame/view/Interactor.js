@@ -80,28 +80,27 @@ var Interactor = cc.Class.extend({
             }
     },
     processEvent: function(evt, type, on) {
-            var code = evt.keyCode;
+        var code = evt.keyCode;
 
-            // if it's not keyboard but a mouse
-            if (typeof evt.button != 'undefined') {
-                    code = (evt.button == 2)? Interactor.RMB : Interactor.LMB;
-            }
+        // if it's not keyboard but a mouse
+        if (typeof evt.button != 'undefined') {
+                code = (evt.button == 2)? Interactor.RMB : Interactor.LMB;
+        }
 
-            for (var keyCode in this.layout.keys) {
-                    if (code == keyCode) {
-
-                            // if key contains an array, then try to execute all of them
-                            if (Array.isArray(this.layout.keys[code])) {
-                                    for (var i in this.layout.keys[code]) {
-                                            this.processKey(evt, type, on, this.layout.keys[code][i]);
-                                    }
-                            // else there is only single operation 
-                            } else {
-                                    this.processKey(evt, type, on, this.layout.keys[code]);
+        for (var keyCode in this.layout.keys) {
+                if (code == keyCode) {
+                    // if key contains an array, then try to execute all of them
+                    if (Array.isArray(this.layout.keys[code])) {
+                            for (var i in this.layout.keys[code]) {
+                                    this.processKey(evt, type, on, this.layout.keys[code][i]);
                             }
+                    // else there is only single operation 
+                    } else {
+                            this.processKey(evt, type, on, this.layout.keys[code]);
                     }
-            }
-            this.afterInteract(evt);
+                }
+        }
+        this.afterInteract(evt);
     },
 
     keyDown: function(evt) {
@@ -253,7 +252,3 @@ cc.defineGetterSetter(_p, 'changed',
 );
 
 module.exports = Interactor;
-
-
-
-

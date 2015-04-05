@@ -61,8 +61,19 @@ _p.identifyPlan = function(plan) {
     return 'unknown';
 };
 
-_p.extractAssets = function(plan) {
+_p.getAllAssets = function() {
+    var result = [];
+    for (var i in this.opts.resources) {
+        result = result.concat(this.thingPlanHelper.getPlanAssets(this.opts.resources[i]));
+    }
     
+    // array_unique
+    return result.filter(
+        function(val, i, arr)
+        {
+            return (i <= arr.indexOf(val));
+        }
+    );
 };
 
 module.exports = CosmosManager;

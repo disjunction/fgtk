@@ -42,4 +42,18 @@ describe("BodyBuilder", function() {
         });
         expect(typeof brick).toBe('object');
     });
+    
+    it('box is created', function() {
+        var bb = makeBodyBuilder();
+        var brick = bb.makeBody({
+            "body" : {
+                type: "box",
+                size: {
+                    width: 3,
+                    height: 2
+                }
+            }
+        });
+        expect(typeof brick).toBe('object');
+    });
 });

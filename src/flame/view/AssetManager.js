@@ -17,6 +17,14 @@ _p.resolveSrc = function(src) {
     return 'http://localhost/dispace-assets/' + src;
 };
 
+_p.resolveSrcArray = function(arr) {
+    var result = [];
+    for (var i = 0; i < arr.length; i++) {
+        result.push(this.resolveSrc(arr[i]));
+    }
+    return result;
+};
+
 _p.getResource = function(path) {
     if (this.opts.resources[path]) {
         return this.opts.resources[path];

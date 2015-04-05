@@ -5,7 +5,6 @@ var cc = require('cc'),
 
 var TiledMapCocosNode = AbstractCocosNode.extend({
     makeNode: function(plan) {
-        console.log('der start');
         var src = this.assetManager.resolveSrc(plan.src),
             node;
         
@@ -16,8 +15,8 @@ var TiledMapCocosNode = AbstractCocosNode.extend({
             }
         });
         node = new TilemapClass();
+        node.setAnchorPoint(0.5,  0.5);
         this.applyPlan(plan, node);
-        console.log('der end');
         return node;
     },
     

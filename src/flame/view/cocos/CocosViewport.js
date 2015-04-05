@@ -18,12 +18,23 @@ var _p = CocosViewport.prototype;
 
 _p.initLayers = function() {
     this.scrolled = this.nb.makeLayer({name: 'scrolled'});
-    var sublayers = ['bg', 'obstacle', 'main', 'stuff', 'targets'];
+    var sublayers = ['bg', 'shadow', 'obstacle', 'main', 'stuff', 'targets'];
+
+    var size = this.getSize();
+
+    this.camera = {
+        scale: 0.5,
+        point: cc.p(0, 0)
+    };
+    this.camera.anchor = cc.p(size.width / 2 * this.camera.scale, size.height / 2 * this.camera.scale);
+    
+    
     for (var i in sublayers) {
         this.scrolled[sublayers[i]] =  this.nb.makeLayer({name: sublayers[i]});
         this.scrolled.addChild(this.scrolled[sublayers[i]]);
+        this.scrolled.setScale(this.camera.scale);
     }
-    
+ 
 };
 
 _p.runScene = function(opts) {
@@ -55,7 +66,7 @@ _p.runScene = function(opts) {
             });
             me.scene = new me.SceneClass();
 
-            cc.director.setDisplayStats(true);                
+            cc.director.setDisplayStats(true);
             cc.director.runScene(me.scene);
         });
     };
@@ -71,25 +82,33 @@ _p.runScene = function(opts) {
     */
 };
 
+_p.getSize = function() {
+    return cc.director.getWinSize();
+};
+
 _p.popScene = function() {
     cc.director.popScene();
-}
+};
 
 _p.renderLayers = function() {
-    /*
-    var me = this;
-    cc.game.onStart = function(){
-        var MyScene = cc.Scene.extend({
-            onEnter: function () {
-                this._super();
-                this.addChild(me.scrolled, 0);
-            }
-        });
-        cc.director.setDisplayStats(true);                
-        cc.director.runScene(new MyScene());
-    };
-    cc.game.run(this.opts.canvasId);
-    */
+};
+
+_p.moveCameraToLocation = function(point) {
+    this.point = point;
+    var position = cc.pAdd(cc.pMult(cc.p(-point.x,-point.y), this.camera.scale * this.opts.config.ppm), this.camera.anchor);
+    this.scrolled.setPosition(position);
+};
+
+_p.scaleCameraTo = function(scale) {
+    this.camera.scale = scale;
+    this.scrolled.setScale(scale);
+    var size = this.getSize();
+    this.camera.anchor = cc.p(size.width / 2 * this.camera.scale, size.height / 2 * this.camera.scale);
+};
+
+
+_p.locationToPosition = function(point) {
+    return cc.pMult(point, this.opts.config.ppm);
 };
 
 module.exports = CocosViewport;

@@ -27,7 +27,7 @@ module.exports = function(fe) {
     };
     
     fe.embody =  function(thing) {
-        thing.body = this.m.box2d.bodyBuilder.makeBody(thing.plan);
+        thing.body = this.m.box2d.bodyBuilder.makeBody(thing.plan, thing.moverConfig || {});
         this.syncBodyFromThing(thing);
         return thing.body;
     };

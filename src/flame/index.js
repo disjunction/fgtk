@@ -1,11 +1,15 @@
 module.exports = {
     engine: {
+        EgoProtagonist: require('./engine/EgoProtagonist'),
         FieldEngine: require('./engine/FieldEngine'),
         BodyBuilder: require('./engine/BodyBuilder')
     },
     entity: {
         Thing: require('./entity/Thing'),
         Field: require('./entity/Field')
+    },
+    rof: {
+        Driver: require('./rof/Driver')
     },
     view: {
         Viewport: require('./view/Viewport'),

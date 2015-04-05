@@ -1,0 +1,17 @@
+{
+    "states" : {
+        "basic" : {
+            "bg": {
+                "layer": "bg",
+                "type": "tiledMap",
+                "src": "vorschlag/bg/vorschlag_bg_vicinity2.tmx",
+                "tilesets": [
+                    "vorschlag/bg/tileset1.png",
+                    "vorschlag/bg/tileset2.png"
+                ],
+                "scale": 0.5,
+                "a": 90
+            }
+        }
+    }
+}

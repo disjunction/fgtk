@@ -32,4 +32,35 @@ _p.getNodeScale = function(nodePlan) {
     return s;
 };
 
+var assetFields = ['src', 'tilesets'];
+_p.getNodePlanAssets = function(nodePlan) {
+    var field;
+    var result = [];
+    for (var i = 0; i < assetFields.length; i++) {
+        field = nodePlan[assetFields[i]];
+        if (!field) continue;
+        
+        var candidates =  Array.isArray(field) ? field : [field];
+        for (var j = 0; j < candidates.length; j++) {
+            result.push(candidates[j]);
+        }
+    }
+    return result;
+};
+
+_p.getPlanAssets = function(thingPlan) {
+    var result = [];
+    if (thingPlan.states) {
+        for (var stateKey in thingPlan.states) {
+            if (stateKey.substring(0, 1) == '_') continue;
+            var state = thingPlan.states[stateKey];
+            for (var nodeKey in state) {
+                result = result.concat(this.getNodePlanAssets(state[nodeKey]))
+            }
+        }
+    }
+    return result;
+};
+
+
 module.exports = ThingPlanHelper;

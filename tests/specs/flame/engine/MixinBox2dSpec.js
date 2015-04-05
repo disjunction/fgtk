@@ -32,7 +32,7 @@ describe('MixinBox2d', function() {
         fe.makeWorld();
         
         var thing = new flame.entity.Thing({
-            plan: fe.opts.cosmosManager.getResource('plans/rover/hull/hull_5x2')
+            plan: fe.opts.cosmosManager.getResource('thing/rover/hull/hull_5x2')
         });
         var body = fe.embody(thing);
         expect(body.GetPosition()).toBeDefined();
