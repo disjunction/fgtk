@@ -34,52 +34,68 @@ var BodyBuilder = cc.Class.extend({
     },
 
     planError: function(message, plan) {
-        return new Error(message + ', plan:' + this.opts.cosmosManager.identifyPlan(plan));
+        if (!plan) {
+            plan = this.tmpPlan;
+            console.log('adjust plan');
+            console.log(this.opts.cosmosManager);
+        }
+        throw new Error(message + ', plan:' + this.opts.cosmosManager.identifyPlan(plan));
+        //return new Error(message + ', plan:' + this.opts.cosmosManager.identifyPlan(plan));
     },
     
-    createDefaultBody: function(extra) {
+    createDefaultBody: function(plan, extra) {
         extra = extra || smog.EMPTY;
         var bd = new b2.BodyDef();
-        bd.type = b2.Body.b2_dynamicBody;
-        bd.linearDamping = extra.linearDamping || 0.7;
-        bd.angularDamping = extra.angularDamping || 1;
+        if (plan.static) {
+            bd.type = b2.Body.b2_staticBody;
+            bd.friction = extra.friction || 2000;
+        } else {
+            bd.type = b2.Body.b2_dynamicBody;
+            bd.linearDamping = extra.linearDamping || 0.7;
+            bd.angularDamping = extra.angularDamping || 1;
+        }
         return this.opts.world.CreateBody(bd);
     },
     
-    makePolygon: function(plan, extra) {
-        var shape = new b2.PolygonShape();
-        if (!plan.body.vertices) {
-            throw this.planError('vertices array is required for polygon body', plan);
+    addShapePolygon: function(body, shapePlan) {
+        if (!shapePlan.vertices) {
+            throw this.planError('vertices array is required for polygon body');
         }
+        var shape = new b2.PolygonShape();
+        
         var b2Vertices = [],
             vec, rot;
-        for (var i = 0; i < plan.body.vertices.length; i++) {
-            vec = new b2.Vec2(plan.body.vertices[i][0], plan.body.vertices[i][1]);
+        for (var i = 0; i < shapePlan.vertices.length; i++) {
+            vec = new b2.Vec2(shapePlan.vertices[i][0], shapePlan.vertices[i][1]);
             
-            if (plan.body.a) {
-                rot = new b2.Rot(plan.body.a / 180 * Math.PI);
+            if (shapePlan.a) {
+                rot = new b2.Rot(shapePlan.a / 180 * Math.PI);
                 vec = b2.Mul_r_v2(rot, vec);
             }
             
             b2Vertices.push(vec);
         }
         shape.Set(b2Vertices, b2Vertices.length);
-        var body = this.createDefaultBody(extra);
         body.CreateFixture(shape, 5.0);
-        return body;
     },
     
-    makeBox: function(plan, extra) {
-        if (plan.a) {
-            throw this.planError("box body doesn't support angle", plan);
+    addShapeBox: function(body, shapePlan) {
+        if (shapePlan.a) {
+            throw this.planError("box body doesn't support angle");
         }
         
-        var shape = new b2.PolygonShape(extra);
-        shape.SetAsBox(plan.body.size.width / 2, plan.body.size.height  / 2);
-
-        var body = this.createDefaultBody(extra);
+        var shape = new b2.PolygonShape();
+        shape.SetAsBox(shapePlan.size.width / 2, shapePlan.size.height  / 2);
         body.CreateFixture(shape, 5.0);
-        return body;
+    },
+    
+    addShape: function(body, shapePlan) {
+        switch (shapePlan.type) {
+            case 'polygon': return this.addShapePolygon(body, shapePlan);
+            case 'box': return this.addShapeBox(body, shapePlan);
+            default:
+                throw new Error('unkown shape type: ' + shapePlan);
+        }
     },
     
     makeBrick:  function(plan, extra) {
@@ -93,7 +109,7 @@ var BodyBuilder = cc.Class.extend({
             var shape = new b2.PolygonShape();
             shape.SetAsBox(size.width / ppm / 2, size.height  / ppm  / 2);
 
-            var body = this.createDefaultBody(extra);
+            var body = this.createDefaultBody(plan, extra);
             body.CreateFixture(shape, 5.0);
             return body;
         } else {
@@ -101,7 +117,10 @@ var BodyBuilder = cc.Class.extend({
         }
     },
     
+    
     makeBody: function(plan, extra) {
+        this.tmpPlan = plan;
+        
         if (!plan.body) {
             throw this.planError('cannot create a body', plan);
         }
@@ -110,14 +129,19 @@ var BodyBuilder = cc.Class.extend({
             return this.makeBrick(plan, extra);
         }
         
-        switch (plan.body.type) {
-            case 'polygon': return this.makePolygon(plan, extra);
-            case 'box': return this.makeBox(plan, extra);
-            default:
-                throw new Error('unkown body type: ' + plan.body.type);
+        var body = this.createDefaultBody(plan, extra);
+        
+        if (plan.body.shapes) {
+            for (var i = 0; i < plan.body.shapes.length; i++) {
+                if (!plan.body.shapes[i].skip) {
+                    this.addShape(body, plan.body.shapes[i]);
+                }
+            }
+        } else {
+            this.addShape(body, plan.body);
         }
         
-        
+        return body;
     }
 });
 

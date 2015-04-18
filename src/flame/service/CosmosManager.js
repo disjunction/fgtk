@@ -56,7 +56,7 @@ _p.getResource = function(path) {
 
 _p.identifyPlan = function(plan) {
     if (plan.name) return plan.name;
-    var node = this.getPrimaryNode(plan);
+    var node = this.thingPlanHelper.getPrimaryNode(plan);
     if (node.src) return node.src;
     return 'unknown';
 };

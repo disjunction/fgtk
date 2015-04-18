@@ -1,6 +1,5 @@
 module.exports = {
     engine: {
-        EgoProtagonist: require('./engine/EgoProtagonist'),
         FieldEngine: require('./engine/FieldEngine'),
         BodyBuilder: require('./engine/BodyBuilder')
     },

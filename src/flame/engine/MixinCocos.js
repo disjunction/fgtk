@@ -1,5 +1,7 @@
 var cc = require('cc');
     
+var x,y,node,thing;
+
 module.exports = function(fe) {
     fe.m.cocos = {};
   
@@ -16,22 +18,31 @@ module.exports = function(fe) {
         
         viewport.addStateToLayer(state);
     };
-    
+        
     fe.syncStateFromThing = function(thing) {
-        if (!thing.state) return;
+        //if (!thing.state) return;
+        //if (thing.plan.static) return;
         for (var i in thing.state.nodes) {
-            var node = thing.state.nodes[i];
-            var x = (node.plan.x || 0) + thing.l.x * config.ppm;
+            node = thing.state.nodes[i];
+            x = (node.plan.x || 0) + thing.l.x * config.ppm;
             node.setPositionX(x);
-            var y = (node.plan.y || 0) + thing.l.y * config.ppm;
+            y = (node.plan.y || 0) + thing.l.y * config.ppm;
             node.setPositionY(y);
             node.setRotation(- thing.a / Math.PI * 180 - (node.plan.a || 0));
         }
     };
     
     fe.fd.addListener('onInjectThing', function(event) {
-        var thing = event.extra.thing;
+        thing = event.extra.thing;
         if (!thing.plan) return;
         this.envision(thing);
     }.bind(fe));    
+    
+    fe.fd.addListener('step', function(event) {
+        for (var i = 0; i < this.field.things.length; i++) {
+            thing = this.field.things[i];
+            if (!thing.state || thing.plan.static) continue;
+            this.syncStateFromThing(thing);
+        }
+    }.bind(fe));
 };

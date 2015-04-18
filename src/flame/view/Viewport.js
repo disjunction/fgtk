@@ -45,8 +45,17 @@ _p.addNodeToLayer = function(node, layerId) {
         if (node.plan.layer) {
             layerId = node.plan.layer;
         }
+    }    
+    
+    if (this.scrolled[layerId]) {
+        this.scrolled[layerId].addChild(node);
+    } else if (this[layerId]) {
+        
+        this[layerId].addChild(node);
+    } else {
+        throw new Error('unknown layerId ' + layerId)
     }
-    this.scrolled[layerId].addChild(node);
+    
 };
 
 _p.addStateToLayer = function(state) {

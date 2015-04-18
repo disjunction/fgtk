@@ -14,7 +14,7 @@ var AssetManager = function(opts) {
 var _p = AssetManager.prototype;
 
 _p.resolveSrc = function(src) {
-    return 'http://localhost/dispace-assets/' + src;
+    return 'http://dispace.local/dispace-assets/' + src;
 };
 
 _p.resolveSrcArray = function(arr) {

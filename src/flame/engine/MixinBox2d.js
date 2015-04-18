@@ -44,7 +44,6 @@ module.exports = function(fe) {
             var thing = this.field.things[i];
             if (thing.body) {
                 this.syncThingFromBody(thing);
-                this.syncStateFromThing(thing);
             }
         }
     }.bind(fe));

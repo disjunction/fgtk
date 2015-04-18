@@ -29,6 +29,8 @@ var Interactor = cc.Class.extend({
      * @param opts object
      */
     ctor: function(opts) {
+        this.opts = opts;
+        
 	this.state = new Interactor.State();
 	if (opts.applier) {
 		this.applier = opts.applier;
@@ -40,65 +42,93 @@ var Interactor = cc.Class.extend({
 	}
     },
 
+    /**
+     * works only for cocos2d
+     * @param object jqueryObject
+     */
+    bindMouseToCustomCursor: function(jqueryObject, layer) {
+        jqueryObject.css({
+            cursor: 'none'
+        });
+               
+        cc.eventManager.addListener({
+            event: cc.EventListener.MOUSE,
+            onMouseMove: function(event){
+                if (this.applier) this.applier.applyEvent(event, 'mouseMove');
+            }.bind(this),
+            onMouseUp: function(event){
+                this.mouseUp(event);
+            }.bind(this),
+            onMouseDown: function(event){
+                this.mouseDown(event);
+            }.bind(this),
+            onMouseScroll: function(event){
+                this.processEvent(event, 'event', true);
+            }.bind(this)
+        }, layer);
+    },
+
     // ignore cocos2d, but bind to jquery events directly
     bindToJquery: function(object) {
         object.keyup(this.keyUp.bind(this));
         object.keydown(this.keyDown.bind(this));
     },
 
-    bindToLayer: function(layer) {
-            if (this.keyUp) {
-                layer.isKeyboardEnabled = true;
-                    layer.keyUp = this.keyUp.bind(this);
-            }
-            if (this.keyDown) {
-                layer.isKeyboardEnabled = true;
-                    layer.keyDown = this.keyDown.bind(this);
-            }
-            if (this.mouseDown) {
-                layer.isMouseEnabled = true;
-                    layer.mouseDown = this.mouseDown.bind(this);
-            }
-            if (this.mouseUp) {
-                layer.isMouseEnabled = true;
-                    layer.mouseUp = this.mouseUp.bind(this);
-            }
+    bindToCocos: function(layer) {
+        var me = this,
+            keyEvt = {keyCode: 0};
+        cc.eventManager.addListener({
+            event: cc.EventListener.KEYBOARD,
+            onKeyPressed:function(key, event) {
+                keyEvt.keyCode = key;
+            	me.keyDown(keyEvt);
+            }.bind(this),
+            onKeyReleased:function(key, event) {
+            	keyEvt.keyCode = key;
+            	me.keyUp(keyEvt);
+            }.bind(this)
+        }, layer);
     },
     processKey: function(evt, type, on, key) {
         if (!this.state.enabled) return;
         switch (key.type) {
             case 'state':
-                    var stateCode = key.state;
-                    on? this.state.on(stateCode) : this.state.off(stateCode);
-                    break;
+                var stateCode = key.state;
+                on? this.state.on(stateCode) : this.state.off(stateCode);
+                break;
             case 'event':
-                    if (key.on == type)
-                            if (this.applier) this.applier.applyEvent(evt, key.event);
-                    break;
+                if (type == key.on) {
+                    if (this.applier) this.applier.applyEvent(evt, key.event);
+                }
+                break;
             default:
                     throw new Error('unknown layout entry type for key ' + evt.keyCode);
-            }
+        }
     },
     processEvent: function(evt, type, on) {
         var code = evt.keyCode;
 
         // if it's not keyboard but a mouse
-        if (typeof evt.button != 'undefined') {
-                code = (evt.button == 2)? Interactor.RMB : Interactor.LMB;
+        // the _right_ way is to use getButton(), but who cares...
+        if (typeof evt._button != 'undefined') {
+            code = (evt._button == 2)? Interactor.RMB : Interactor.LMB;
+        }
+        
+        if (typeof evt._scrollY != 'undefined' && evt._scrollY != 0 ) {
+            code = Interactor.SCROLL;
+            type = (evt._scrollY > 0)? 'up' : 'down';
         }
 
-        for (var keyCode in this.layout.keys) {
-                if (code == keyCode) {
-                    // if key contains an array, then try to execute all of them
-                    if (Array.isArray(this.layout.keys[code])) {
-                            for (var i in this.layout.keys[code]) {
-                                    this.processKey(evt, type, on, this.layout.keys[code][i]);
-                            }
-                    // else there is only single operation 
-                    } else {
-                            this.processKey(evt, type, on, this.layout.keys[code]);
-                    }
+        if (this.layout.keys[code]) {
+            // if key contains an array, then try to execute all of them
+            if (Array.isArray(this.layout.keys[code])) {
+                for (var i in this.layout.keys[code]) {
+                    this.processKey(evt, type, on, this.layout.keys[code][i]);
                 }
+            // else there is only single operation 
+            } else {
+                this.processKey(evt, type, on, this.layout.keys[code]);
+            }
         }
         this.afterInteract(evt);
     },
@@ -111,10 +141,10 @@ var Interactor = cc.Class.extend({
         this.processEvent(evt, 'keyUp', false);
     },
     mouseDown: function(evt) {
-        this.processEvent(evt, 'mouseDown', true);
+        this.processEvent(evt, 'keyDown', true);
     },
     mouseUp: function(evt) {
-        this.processEvent(evt, 'mouseUp', false);
+        this.processEvent(evt, 'keyUp', false);
     },
 
     afterInteract: function(evt) {
@@ -173,7 +203,9 @@ var keyMap = {
 	SPACE: 32,
 	       
         EQUAL: 61,
+        CHROME_EQUAL: 187,
         MINUS: 173,
+        CHROME_MINUS: 189,
         
         PRESS_SHARP: 35,
         
@@ -181,7 +213,9 @@ var keyMap = {
         CTRL: 17,
         
 	LMB: 1001,
-	RMB: 1002
+	RMB: 1002,
+        
+        SCROLL: 1010
 };
 for (var i in keyMap) {
 	Interactor[i] = keyMap[i];

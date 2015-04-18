@@ -3,7 +3,8 @@ var cc = require('cc'),
     rof = require('flame/rof');
 
 var chasisMapping = {
-    airCushion: require('flame/rof/chasis/AirCushionChasis')
+    airCushion: require('flame/rof/chasis/AirCushionChasis'),
+    track: require('flame/rof/chasis/TrackChasis')
 };
 
 

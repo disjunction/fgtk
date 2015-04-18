@@ -13,8 +13,11 @@ var cc = require('cc'),
 var CocosViewport = Viewport.extend({
 });
 
+// reusable point objects
+var p1 = cc.p(0, 0),
+    p2 = cc.p(0, 0);
+    
 var _p = CocosViewport.prototype;
-
 
 _p.initLayers = function() {
     this.scrolled = this.nb.makeLayer({name: 'scrolled'});
@@ -34,6 +37,8 @@ _p.initLayers = function() {
         this.scrolled.addChild(this.scrolled[sublayers[i]]);
         this.scrolled.setScale(this.camera.scale);
     }
+    
+    this.hud = this.nb.makeLayer({name: 'hud'});
  
 };
 
@@ -53,6 +58,7 @@ _p.runScene = function(opts) {
                     this._super();
                     me.initLayers();
                     this.addChild(me.scrolled, 0);
+                    this.addChild(me.hud, 0);
                     if (opts.onRun) {
                         opts.onRun();
                     }
@@ -71,15 +77,6 @@ _p.runScene = function(opts) {
         });
     };
     cc.game.run(this.opts.canvasId);
-    
-    /*
-    this.scrolled = this.nb.makeLayer({name: 'scrolled'});
-    var sublayers = ['bg', 'obstacle', 'main', 'stuff', 'targets'];
-    for (var i in sublayers) {
-        this.scrolled[sublayers[i]] =  this.nb.makeLayer({name: sublayers[i]});
-        this.scrolled.addChild(this.scrolled[sublayers[i]]);
-    }
-    */
 };
 
 _p.getSize = function() {
@@ -93,10 +90,19 @@ _p.popScene = function() {
 _p.renderLayers = function() {
 };
 
-_p.moveCameraToLocation = function(point) {
-    this.point = point;
-    var position = cc.pAdd(cc.pMult(cc.p(-point.x,-point.y), this.camera.scale * this.opts.config.ppm), this.camera.anchor);
-    this.scrolled.setPosition(position);
+/**
+ * ugly manual calculation to avoid extra object creation
+ * @param float x
+ * @param float y
+ */
+_p.moveCameraToLocationXY = function(x, y) {
+    var point = this.camera.point;
+    point.x = x;
+    point.y = y;
+    var pixelScale = this.camera.scale * this.opts.config.ppm;
+    p1.x = this.camera.anchor.x - x * pixelScale;
+    p1.y = this.camera.anchor.y - y * pixelScale;
+    this.scrolled.setPosition(p1);
 };
 
 _p.scaleCameraTo = function(scale) {
@@ -105,7 +111,6 @@ _p.scaleCameraTo = function(scale) {
     var size = this.getSize();
     this.camera.anchor = cc.p(size.width / 2 * this.camera.scale, size.height / 2 * this.camera.scale);
 };
-
 
 _p.locationToPosition = function(point) {
     return cc.pMult(point, this.opts.config.ppm);
