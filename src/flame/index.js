@@ -1,7 +1,9 @@
 module.exports = {
     engine: {
         FieldEngine: require('./engine/FieldEngine'),
-        BodyBuilder: require('./engine/BodyBuilder')
+        BodyBuilder: require('./engine/BodyBuilder'),
+        ModuleCocos: require('./engine/ModuleCocos'),
+        ModuleBox2d: require('./engine/ModuleBox2d')
     },
     entity: {
         Thing: require('./entity/Thing'),

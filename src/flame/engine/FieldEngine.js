@@ -2,6 +2,11 @@ var cc = require('cc'),
     Field = require('flame/entity/Field'),
     EventDispatcher = require('smog/util/EventDispatcher');
 
+var stepEvent = {
+    type: 'step',
+    dt: 0
+};
+
 var FieldEngine = cc.Class.extend({
     
     /**
@@ -40,10 +45,20 @@ var FieldEngine = cc.Class.extend({
             }
         }
     },
+
+    registerModule: function(module, name) {
+        this.m[name] = module;
+        module.injectFe(this, name);
+    },
     
+    step: function(dt) {
+        stepEvent.dt = dt;
+        this.fe.fd.dispatch(stepEvent);
+    },
+
     injectThing: function(thing) {
         this.field.things.push(thing);
-        this.fd.dispatch('onInjectThing', {
+        this.fd.dispatch('injectThing', {
             thing: thing
         });
     },
