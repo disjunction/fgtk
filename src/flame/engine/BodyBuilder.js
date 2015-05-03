@@ -36,8 +36,6 @@ var BodyBuilder = cc.Class.extend({
     planError: function(message, plan) {
         if (!plan) {
             plan = this.tmpPlan;
-            console.log('adjust plan');
-            console.log(this.opts.cosmosManager);
         }
         throw new Error(message + ', plan:' + this.opts.cosmosManager.identifyPlan(plan));
         //return new Error(message + ', plan:' + this.opts.cosmosManager.identifyPlan(plan));

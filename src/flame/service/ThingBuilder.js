@@ -13,7 +13,7 @@ var ThingBuilder = function(opts) {
     this.opts = opts || {classCollections: {}};
 };
 
-var _p = CosmosManager.prototype;
+var _p = ThingBuilder.prototype;
 
 _p.getClass = function(name) {
     if (name == 'Thing') {

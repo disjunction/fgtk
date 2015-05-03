@@ -1,4 +1,5 @@
 var cc = require('cc'),
+    geo = require('smog').util.geo,
     ModuleAbstract = require('./ModuleAbstract');
     
 var x,y,node,thing;
@@ -10,6 +11,21 @@ var x,y,node,thing;
  * * config
  */
 var ModuleCocos = ModuleAbstract.extend({
+    ctor: function(opts) {
+        ModuleAbstract.prototype.ctor.call(this, opts);
+        
+        var config = cc.clone(opts.config);
+        if (!config.viewport) config.viewport = {};
+        
+        // shift in meters for a thing haveing elevation of 1 and being 1 meter away from camera
+        if (!config.viewport.elevationShiftFactor) {
+            config.viewport.elevationShiftRatio = 0.02;
+        }
+        if (!config.viewport.scaleFactor) config.viewport.elevationScaleRatio = 0;
+        
+        this.config = config;
+    },
+    
     injectFe: function(fe, name) {
         ModuleAbstract.prototype.injectFe.call(this, fe, name);
 
@@ -22,7 +38,7 @@ var ModuleCocos = ModuleAbstract.extend({
         this.fe.fd.addListener('moveThing', function(event) {
             this.syncStateFromThing(event.thing);
         }.bind(this));
-        /*
+
         this.fe.fd.addListener('step', function(event) {
             for (var i = 0; i < this.fe.field.things.length; i++) {
                 thing = this.fe.field.things[i];
@@ -30,7 +46,6 @@ var ModuleCocos = ModuleAbstract.extend({
                 this.syncStateFromThing(thing);
             }
         }.bind(this));
-        */
     },
    
     envision: function(thing) {
@@ -46,13 +61,36 @@ var ModuleCocos = ModuleAbstract.extend({
     syncStateFromThing: function(thing) {
         for (var i in thing.state.nodes) {
             node = thing.state.nodes[i];
-            x = (node.plan.x || 0) + thing.l.x * this.opts.config.ppm;
+            
+            x = thing.l.x;
+            y = thing.l.y;
+            
+            if (node.plan.elevation && !this.opts.skipElevation) {
+                var elevatedRatio = node.plan.elevation * this.config.viewport.elevationShiftRatio;
+                x += (thing.l.x - this.opts.viewport.camera.cameraLocation.x) * elevatedRatio;
+                y += (thing.l.y - this.opts.viewport.camera.cameraLocation.y) * elevatedRatio;
+            }
+            
+            x = (node.plan.x || 0) + x * this.config.ppm;
+            y = (node.plan.y || 0) + y * this.config.ppm;
+                    
+            if (node.plan.round) {
+                x = Math.round(x);
+                y = Math.round(y);
+            }
+            
+            if (thing.stretcher) {
+                if (thing.stretcher.scaleX < 0) {
+                    thing.stretcher.scaleX = thing.stretcher.distance / thing.stretcher.size.width * this.opts.config.ppm;
+                    thing.stretcher.primaryNode.setScaleX(thing.stretcher.scaleX);
+                }
+            }
+            
             node.setPositionX(x);
-            y = (node.plan.y || 0) + thing.l.y * this.opts.config.ppm;
             node.setPositionY(y);
-            node.setRotation(- thing.a / Math.PI * 180 - (node.plan.a || 0));
+            node.setRotation(geo.r2d(-thing.a) - (node.plan.a || 0));
         }
-    }
+    },
 });
 
 module.exports = ModuleCocos;

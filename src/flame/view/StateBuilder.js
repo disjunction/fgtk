@@ -1,6 +1,7 @@
 "use strict";
 
-var cc = require('cc');
+var cc = require('cc'),
+    geo = require('smog').util.geo;
 
 /**
  * opts:
@@ -27,6 +28,22 @@ _p.makeState = function(nodeBunchPlan, stateName) {
     state.name = stateName;
     return state;
 };
+
+
+
+/**
+ * stretchDef is any object containing 
+ * @param {object} state
+ * @param {object} stretchDef
+ * @returns {undefined}
+ */
+_p.stretchState = function(state, p1, p2) {
+    for (var i in state.nodes) {
+        this.opts.nb.stretchNode(state.nodes[i], p1, p2);
+    }
+};
+
+
 
 
 module.exports = StateBuilder;

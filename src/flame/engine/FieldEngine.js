@@ -2,10 +2,10 @@ var cc = require('cc'),
     Field = require('flame/entity/Field'),
     EventDispatcher = require('smog/util/EventDispatcher');
 
-var stepEvent = {
-    type: 'step',
-    dt: 0
-};
+var stepEvent = {type: 'step', dt: 0},
+    prestepEvent = {type: 'prestep', dt: 0},
+    poststepEvent = {type: 'poststep', dt: 0};
+    
 
 var FieldEngine = cc.Class.extend({
     
@@ -31,6 +31,11 @@ var FieldEngine = cc.Class.extend({
          */
         this.m = {};
         
+        /**
+         * sum of all dt since start of the engine
+         */
+        this.timeSum = 0;
+        
         this.fd = new EventDispatcher();
         this.field = new Field();
                         
@@ -52,8 +57,11 @@ var FieldEngine = cc.Class.extend({
     },
     
     step: function(dt) {
-        stepEvent.dt = dt;
-        this.fe.fd.dispatch(stepEvent);
+        stepEvent.dt = prestepEvent.dt = poststepEvent.dt = dt;
+        this.timeSum += dt;
+        this.fd.dispatch(prestepEvent);
+        this.fd.dispatch(stepEvent);
+        this.fd.dispatch(poststepEvent);
     },
 
     injectThing: function(thing) {

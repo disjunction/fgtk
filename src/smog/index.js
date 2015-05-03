@@ -10,6 +10,7 @@ module.exports = {
     app: new (require('./app/App')),
     util: {
         EventDispatcher: require('./util/EventDispatcher'),
-        UidGenerator: require('./util/UidGenerator')
+        UidGenerator: require('./util/UidGenerator'),
+        geo: require('./util/geo')
     }
 };

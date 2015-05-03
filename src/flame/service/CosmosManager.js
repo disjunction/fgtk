@@ -40,6 +40,9 @@ var CosmosManager = function(opts) {
 var _p = CosmosManager.prototype;
 
 _p.getResource = function(path) {
+    if (!path) {
+        throw new Error('bad path for getResource: ' + path);
+    }
     if (path.substring(path.length - 5) != '.json') {
         path += '.json';
     }

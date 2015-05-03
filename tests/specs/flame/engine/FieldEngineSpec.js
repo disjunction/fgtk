@@ -11,13 +11,8 @@ describe("FieldEngine", function() {
           config: {
               ppm: 32
           },
-          mixins: {
-              box2d: {
-                  
-              }
-          }
       });
-      fe.makeWorld();
+      fe.m.b2.makeWorld();
       
    });
 });

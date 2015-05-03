@@ -1,5 +1,9 @@
 module.exports = {
     engine: {
+        ray: {
+            RayClosestFilterFunction: require('./engine/ray/RayClosestFilterFunction'),
+            RayClosest: require('./engine/ray/RayClosest'),
+        },
         FieldEngine: require('./engine/FieldEngine'),
         BodyBuilder: require('./engine/BodyBuilder'),
         ModuleCocos: require('./engine/ModuleCocos'),
@@ -29,6 +33,7 @@ module.exports = {
     },
     service: {
         CosmosManager: require('./service/CosmosManager'),
+        ThingBuilder: require('./service/ThingBuilder'),
         ThingPlanHelper: require('./service/ThingPlanHelper')
     }
 };

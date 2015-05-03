@@ -5,7 +5,8 @@ var b2 = require('jsbox2d'),
 
 var moveThingEvent = {
     type: 'moveThing',
-    thing: null
+    thing: null,
+    dt: 0
 };
 
 /**
@@ -28,8 +29,8 @@ var ModuleBox2d = ModuleAbstract.extend({
             this.world.Step(event.dt, 8, 3);
             for (var i = 0; i < this.fe.field.things.length; i++) {
                 var thing = this.fe.field.things[i];
-                if (thing.body) {
-                    this.syncThingFromBody(thing);
+                if (thing.body && thing.body.IsAwake()) {
+                    this.syncThingFromBody(thing, event.dt);
                 }
             }
         }.bind(this));
@@ -47,22 +48,77 @@ var ModuleBox2d = ModuleAbstract.extend({
         });
     },
     
-    syncThingFromBody: function(thing) {
+    syncThingFromBody: function(thing, dt) {
         thing.l = thing.body.GetPosition();
         thing.a = thing.body.GetAngle();
         moveThingEvent.thing = thing;
+        moveThingEvent.dt = dt;
         this.fe.fd.dispatch(moveThingEvent);
     },
     
-    syncBodyFromThing: function(thing) {
+    syncBodyFromThing: function(thing, dt) {
         thing.body.SetTransform(thing.l, thing.a);
     },
     
     embody:  function(thing) {
         thing.body = this.bodyBuilder.makeBody(thing.plan, thing.moverConfig || {});
-        this.syncBodyFromThing(thing);
+        thing.body.SetUserData(thing);
+        this.syncBodyFromThing(thing, 0);
         return thing.body;
-    }
+    },
+    
+    makeLoopEdges: function(points, edgeThing) {
+        if (!edgeThing) {
+            throw new Error('edgeThing must be defined in makeLoopEdges');
+        }
+        
+        var bd = new b2.BodyDef();
+        this.loopEdges = this.world.CreateBody(bd);
+        this.loopEdges.SetUserData(edgeThing);
+        var shape = new b2.ChainShape();
+        shape.CreateLoop(points, points.length);
+        this.loopEdges.CreateFixture(shape, 0.0);
+    },
+    
+    /**
+     * @param {RayAbstract} callback
+     * @param {b2.Vec2} p1
+     * @param {b2.Vec2} p2
+     */
+    rayCast: function(callback, p1, p2) {
+        callback.reset();
+        this.world.RayCast(callback, p1, p2)
+        callback.muzzlePoint = p1;
+        callback.missPoint = p2;
+    },
+
+    /**
+     * 
+     * @param {RayAbstract} callback
+     * @param {Thing} thing
+     * @param float range
+     * @returns {b2.Vec2} p2 (i.e. furthest possible point in casde of miss)
+     */
+    rayCastFromThing: function(callback, thing, range, radius) {
+        var cos = Math.cos(thing.a),
+            sin = Math.sin(thing.a),
+            muzzlePoint;
+
+        if (radius) {
+            muzzlePoint = new b2.Vec2(
+                thing.l.x + radius * cos,
+                thing.l.y + radius * sin
+            );
+        } else {
+            muzzlePoint = thing.l;
+        }
+
+        var endPoint = new b2.Vec2(
+                thing.l.x + range * cos,
+                thing.l.y + range * sin
+            );
+        this.rayCast(callback, muzzlePoint, endPoint);
+    },
 });
 
 module.exports = ModuleBox2d;

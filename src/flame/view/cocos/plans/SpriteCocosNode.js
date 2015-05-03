@@ -5,20 +5,32 @@ var cc = require('cc'),
 
 var SpriteCocosNode = AbstractCocosNode.extend({
     makeNode: function(plan) {
-        var imgSrc = this.assetManager.resolveSrc(plan.src),
-            node;
-        if (plan.subrect) {
-            node = cc.Sprite.create(imgSrc, cc.rect.apply(cc, plan.subrect));
-        } else {
-            node = cc.Sprite.create(imgSrc);
-        }
-
+        var node = cc.Sprite.create(plan.spriteCache.frames[0]);
         this.applyPlan(plan, node);                
         return node;
     },
-    
     hydratePlan: function(plan) {
-        return plan;
+        if (!plan.spriteCache) {
+            var texture = cc.textureCache.addImage(this.assetManager.resolveSrc(plan.src)),
+                rect = (plan.subrect ?
+                    cc.rect.apply(cc, plan.subrect) :
+                    cc.rect(0, 0, texture._contentSize.width, texture._contentSize.height)),
+                c = {
+                    texture: texture,
+                    frames: [
+                        new cc.SpriteFrame(texture, rect)
+                    ]
+                };
+                
+            if (plan.frames) {
+                for (var i = 0; i < plan.frames.length; i++) {
+                    c.frames.push(new cc.SpriteFrame(texture, cc.rect.apply(cc, plan.frames[i])));
+                }
+            }
+
+            plan.spriteCache = c;
+        }
+        AbstractCocosNode.prototype.hydratePlan.call(this, plan);
     }
 });
 
