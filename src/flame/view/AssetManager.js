@@ -4,6 +4,7 @@ var cc = require('cc');
 
 /**
  * opts:
+ * * config
  * * resources
  * @param opts
   */
@@ -14,7 +15,13 @@ var AssetManager = function(opts) {
 var _p = AssetManager.prototype;
 
 _p.resolveSrc = function(src) {
-    return 'http://dispace.local/dispace-assets/' + src;
+    var prefix;
+    if (this.opts.config) {
+        prefix = this.opts.config.assetPrefix;
+    } else {
+        prefix = '/';
+    }
+    return prefix + src;
 };
 
 _p.resolveSrcArray = function(arr) {
