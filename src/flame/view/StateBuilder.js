@@ -30,20 +30,4 @@ _p.makeState = function(nodeBunchPlan, stateName) {
 };
 
 
-
-/**
- * stretchDef is any object containing 
- * @param {object} state
- * @param {object} stretchDef
- * @returns {undefined}
- */
-_p.stretchState = function(state, p1, p2) {
-    for (var i in state.nodes) {
-        this.opts.nb.stretchNode(state.nodes[i], p1, p2);
-    }
-};
-
-
-
-
 module.exports = StateBuilder;

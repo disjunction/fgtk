@@ -50,7 +50,7 @@ Thing.stretch = function(thing, l1, l2) {
         size: {width: primaryNode.width, height: primaryNode.height}
     };
 
-    thing.a = geo.segment2Angle(l2, l1);
+    thing.a = geo.segment2Angle(l1, l2);
     thing.l = geo.middle(l2, l1);
 };
 

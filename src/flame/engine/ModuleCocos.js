@@ -73,7 +73,7 @@ var ModuleCocos = ModuleAbstract.extend({
             
             x = (node.plan.x || 0) + x * this.config.ppm;
             y = (node.plan.y || 0) + y * this.config.ppm;
-                    
+
             if (node.plan.round) {
                 x = Math.round(x);
                 y = Math.round(y);

@@ -4,7 +4,8 @@ var planMapping = {
     sprite: require('flame/view/cocos/plans/SpriteCocosNode'),
     layer: require('flame/view/cocos/plans/LayerCocosNode'),
     tiledMap: require('flame/view/cocos/plans/TiledMapCocosNode'),
-    bar: require('flame/view/cocos/plans/BarCocosNode')
+    bar: require('flame/view/cocos/plans/BarCocosNode'),
+    container: require('flame/view/cocos/plans/ContainerCocosNode'),
 };
 
 var CocosNodeBuilder = function(opts) {
