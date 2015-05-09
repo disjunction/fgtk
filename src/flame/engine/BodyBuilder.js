@@ -87,9 +87,16 @@ var BodyBuilder = cc.Class.extend({
         body.CreateFixture(shape, 5.0);
     },
     
+    addShapeCircle: function(body, shapePlan) {      
+        var shape = new b2.CircleShape();
+        shape.m_radius = shapePlan.radius;
+        body.CreateFixture(shape, 5.0);
+    },
+    
     addShape: function(body, shapePlan) {
         switch (shapePlan.type) {
             case 'polygon': return this.addShapePolygon(body, shapePlan);
+            case 'circle': return this.addShapeCircle(body, shapePlan);
             case 'box': return this.addShapeBox(body, shapePlan);
             default:
                 throw new Error('unkown shape type: ' + shapePlan);

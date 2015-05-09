@@ -19,7 +19,7 @@ var ModuleCocos = ModuleAbstract.extend({
         
         // shift in meters for a thing haveing elevation of 1 and being 1 meter away from camera
         if (!config.viewport.elevationShiftFactor) {
-            config.viewport.elevationShiftRatio = 0.02;
+            config.viewport.elevationShiftRatio = 0.01;
         }
         if (!config.viewport.scaleFactor) config.viewport.elevationScaleRatio = 0;
         
