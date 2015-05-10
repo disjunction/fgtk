@@ -138,7 +138,7 @@ _p.scrolledLocation2Target = function (point) {
     var absCorner = cc.pSub(this.camera.cameraLocation, this.camera.centerShift),
             result = cc.pMult(cc.pSub(point, absCorner), this.camera.pixelScale);
     return result;
-    //return cc.p(Math.round(result.x), Math.round(result.y));  
+    //return cc.p(Math.round(result.x), Math.round(result.y));
 };
 
 _p.applyAnimation = function (node) {
@@ -150,7 +150,11 @@ _p.applyAnimation = function (node) {
 _p.addNodeToLayer = function (node, layerId) {
     Viewport.prototype.addNodeToLayer.call(this, node, layerId);
     this.applyAnimation(node);
-    
+
+};
+
+_p.getAudioEngine = function() {
+    return cc.audioEngine;
 };
 
 module.exports = CocosViewport;
