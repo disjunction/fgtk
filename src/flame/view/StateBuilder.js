@@ -19,7 +19,12 @@ _p.makeState = function(nodeBunchPlan, stateName) {
     if (!nodeBunchPlan.states[stateName]) {
         throw new Error('unknown state "' + stateName + '"');
     }
+
     for (var i in nodeBunchPlan.states[stateName]) {
+        // treat nodeId starting with underscore, as comments
+        if (i.substring(0,1) == '_') {
+            continue;
+        }
         var plan = nodeBunchPlan.states[stateName][i];
         plan.name = i;
         var node = this.opts.nb.makeNode(plan);

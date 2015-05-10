@@ -2,6 +2,7 @@
 
 var planMapping = {
     sprite: require('flame/view/cocos/plans/SpriteCocosNode'),
+    label: require('flame/view/cocos/plans/LabelCocosNode'),
     layer: require('flame/view/cocos/plans/LayerCocosNode'),
     tiledMap: require('flame/view/cocos/plans/TiledMapCocosNode'),
     bar: require('flame/view/cocos/plans/BarCocosNode'),
@@ -13,9 +14,9 @@ var CocosNodeBuilder = function(opts) {
     this.opts = opts || {};
     this.builders = [];
 };
-    
+
 var _p = CocosNodeBuilder.prototype;
-    
+
 /**
  * Lazy load of node builders for each plan type
  * @param {type} type
@@ -34,12 +35,12 @@ _p.getNodeBuilderByType = function(type) {
 _p.makeNode =  function(plan) {
     plan.type = plan.type || 'sprite';
     var builder = this.getNodeBuilderByType(plan.type);
-    
+
     // extend plan with defaults
     if (builder.hydratePlan) {
         builder.hydratePlan(plan);
     }
-    
+
     var node = builder.makeNode(plan);
     node.plan = plan;
     return node;

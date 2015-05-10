@@ -23,7 +23,7 @@ _p.getPrimaryNode = function(plan) {
 };
 
 _p.getNodeScale = function(nodePlan) {
-    var s = nodePlan.scale;   
+    var s = nodePlan.scale;
     if (s) {
         if (typeof s != 'object') {
             s = {x: s, y: s};
@@ -39,7 +39,7 @@ _p.getNodePlanAssets = function(nodePlan) {
     for (var i = 0; i < assetFields.length; i++) {
         field = nodePlan[assetFields[i]];
         if (!field) continue;
-        
+
         var candidates =  Array.isArray(field) ? field : [field];
         for (var j = 0; j < candidates.length; j++) {
             result.push(candidates[j]);
@@ -60,6 +60,26 @@ _p.getPlanAssets = function(thingPlan) {
         }
     }
     return result;
+};
+
+_p.readColor = function(value) {
+    if (typeof value != 'string') {
+        return value;
+    }
+    
+    return {
+        r: parseInt(value.substring(1,3), 16),
+        g: parseInt(value.substring(3,5), 16),
+        b: parseInt(value.substring(5,7), 16),
+        a: 255
+    };
+},
+
+_p.readValue = function(value) {
+    if (typeof value == 'string' && value[0] == '#') {
+        return this.readColor(value);
+    }
+    return value;
 };
 
 

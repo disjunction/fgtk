@@ -11,16 +11,14 @@ var BarCocosNode = AbstractCocosNode.extend({
         if (nodePlan.color.length != 7 || nodePlan.color[0] != '#') {
             throw new Error('bad color code ' + nodePlan.color + ' for BarCocosNode');
         }
-        
-        var color = new cc.Color(parseInt(nodePlan.color.substring(1,3), 16),
-                                 parseInt(nodePlan.color.substring(3,5), 16),
-                                 parseInt(nodePlan.color.substring(5,7), 16),
-                                 255);
+
+        var color = this.opts.cosmosManager.thingPlanHelper.readValue(nodePlan.color);
+
         var node = cc.LayerColor.create(color, nodePlan.width, nodePlan.height);
         this.applyPlan(nodePlan, node);
         return node;
     },
-    
+
     hydratePlan: function(nodePlan) {
         if (!nodePlan.x) {
             nodePlan.x = - nodePlan.width / 2;

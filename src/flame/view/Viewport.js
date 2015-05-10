@@ -51,8 +51,8 @@ _p.addNodeToLayer = function(node, layerId) {
     if (node.plan.zIndex) {
         zIndex = node.plan.zIndex;
     } else if (node.plan.elevation) {
-        zIndex = node.plan.elevation;
-        layerId += node.plan.elevation;
+        zIndex = node.plan.elevation * 100;
+        //layerId += node.plan.elevation;
     }
     
     if (this.scrolled[layerId]) {
