@@ -62,7 +62,7 @@ var ModuleCocos = ModuleAbstract.extend({
                 node.thingShift = {
                     r: cc.pLength(nodePoint),
                     a: cc.pToAngle(nodePoint)
-                }
+                };
             }
         }
 

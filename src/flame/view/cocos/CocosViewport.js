@@ -1,7 +1,7 @@
 "use strict";
 
 var cc = require('cc'),
-        Viewport = require('flame/view/Viewport');
+    Viewport = require('flame/view/Viewport');
 
 /** Used as a structured container for visual elements; encapsulates node factory and layers
  * opts:
@@ -153,7 +153,19 @@ _p.addNodeToLayer = function (node, layerId) {
 
 };
 
+_p.initAudio = function() {
+    var ae = cc.audioEngine,
+        audioConfig = this.opts.config.audio || {};
+
+    ae.setEffectsVolume(typeof audioConfig.effectsVolume != 'undefined' ? audioConfig.effectsVolume : 0.5);
+    ae.setMusicVolume(typeof audioConfig.musicVolume != 'undefined' ? audioConfig.musicVolume : 0.5);
+    this.audioInitialized = true;
+};
+
 _p.getAudioEngine = function() {
+    if (!this.audioInitialized) {
+        this.initAudio();
+    }
     return cc.audioEngine;
 };
 
