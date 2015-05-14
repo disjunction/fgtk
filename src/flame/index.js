@@ -34,6 +34,7 @@ module.exports = {
     service: {
         CosmosManager: require('./service/CosmosManager'),
         ThingBuilder: require('./service/ThingBuilder'),
-        ThingPlanHelper: require('./service/ThingPlanHelper')
+        ThingPlanHelper: require('./service/ThingPlanHelper'),
+        ThingFinder: require('./service/ThingFinder')
     }
 };

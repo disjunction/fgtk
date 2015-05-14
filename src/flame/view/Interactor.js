@@ -1,18 +1,16 @@
-"use strict";
-
-var cc    = require('cc');
+var cc = require('cc');
 
 /**
  * opts.layer - cocs2d.nodes.Layer to bind to
- * opts.applier - see ProtagonistApplier below 
+ * opts.applier - see ProtagonistApplier below
  * opts.layout = {
  *     keys: {
  *     		// up
- *          38: { 
+ *          38: {
  *          	type: 'state',
  *              state: 'up'
  *          },
- *          
+ *
  *          // space
  *          32: {
  *          	type: 'event',
@@ -30,13 +28,13 @@ var Interactor = cc.Class.extend({
      */
     ctor: function(opts) {
         this.opts = opts;
-        
+
 	this.state = new Interactor.State();
 	if (opts.applier) {
 		this.applier = opts.applier;
 	}
 	this.layout = (opts.layout)? opts.layout : {keys: {}};
-	
+
 	if (opts.layer) {
 		this.bindToLayer(opts.layer);
 	}
@@ -50,7 +48,7 @@ var Interactor = cc.Class.extend({
         jqueryObject.css({
             cursor: 'none'
         });
-               
+
         cc.eventManager.addListener({
             event: cc.EventListener.MOUSE,
             onMouseMove: function(event){
@@ -113,7 +111,7 @@ var Interactor = cc.Class.extend({
         if (typeof evt._button != 'undefined') {
             code = (evt._button == 2)? Interactor.RMB : Interactor.LMB;
         }
-        
+
         if (typeof evt._scrollY != 'undefined' && evt._scrollY != 0 ) {
             code = Interactor.SCROLL;
             type = (evt._scrollY > 0)? 'up' : 'down';
@@ -125,7 +123,7 @@ var Interactor = cc.Class.extend({
                 for (var i in this.layout.keys[code]) {
                     this.processKey(evt, type, on, this.layout.keys[code][i]);
                 }
-            // else there is only single operation 
+            // else there is only single operation
             } else {
                 this.processKey(evt, type, on, this.layout.keys[code]);
             }
@@ -161,19 +159,19 @@ var keyMap = {
 	ARROW_UP: 38,
 	ARROW_RIGHT: 39,
 	ARROW_DOWN: 40,
-	
-        DIGIT_0: 48,	
-        DIGIT_1: 49,
-        DIGIT_2: 50,
-        DIGIT_3: 51,
-        DIGIT_4: 52,
-        DIGIT_5: 53,
-        DIGIT_6: 54,
-        DIGIT_7: 55,
-        DIGIT_8: 56,
-        DIGIT_9: 57,
-    
-        KEY_A: 65,
+
+    DIGIT_0: 48,
+    DIGIT_1: 49,
+    DIGIT_2: 50,
+    DIGIT_3: 51,
+    DIGIT_4: 52,
+    DIGIT_5: 53,
+    DIGIT_6: 54,
+    DIGIT_7: 55,
+    DIGIT_8: 56,
+    DIGIT_9: 57,
+
+    KEY_A: 65,
 	KEY_B: 66,
 	KEY_C: 67,
 	KEY_D: 68,
@@ -199,22 +197,22 @@ var keyMap = {
 	KEY_X: 88,
 	KEY_Y: 89,
 	KEY_Z: 95,
-	
+
 	SPACE: 32,
-	       
-        EQUAL: 61,
-        CHROME_EQUAL: 187,
-        MINUS: 173,
-        CHROME_MINUS: 189,
-        
-        PRESS_SHARP: 35,
-        
-        SHIFT: 16,
-        CTRL: 17,
-        
+
+    EQUAL: 61,
+    CHROME_EQUAL: 187,
+    MINUS: 173,
+    CHROME_MINUS: 189,
+
+    PRESS_SHARP: 35,
+
+    SHIFT: 16,
+    CTRL: 17,
+
 	LMB: 1001,
 	RMB: 1002,
-        
+
         SCROLL: 1010
 };
 for (var i in keyMap) {
@@ -242,7 +240,7 @@ Interactor.State = cc.Class.extend({
      */
     ctor: function() {
         this._c = 1;
-        
+
         // this is used to disable any keypress processing
         this._enabled = true;
     },

@@ -1,6 +1,7 @@
 var b2 = require('jsbox2d'),
     cc = require('cc'),
     BodyBuilder = require('flame/engine/BodyBuilder'),
+    ThingFinder = require('flame/service/ThingFinder'),
     ModuleAbstract = require('./ModuleAbstract');
 
 var moveThingEvent = {
@@ -18,7 +19,7 @@ var moveThingEvent = {
 var ModuleBox2d = ModuleAbstract.extend({
     injectFe: function(fe, name) {
         ModuleAbstract.prototype.injectFe.call(this, fe, name);
-        
+
         this.fe.fd.addListener('injectThing', function(event) {
             var thing = event.extra.thing;
             if (!thing.plan || !thing.plan.body) return;
@@ -35,19 +36,23 @@ var ModuleBox2d = ModuleAbstract.extend({
             }
         }.bind(this));
     },
-    
+
     makeWorld: function(size) {
         this.world = new b2.World(new b2.Vec2(0, 0));
         this.world.size = size || {width: 100, height: 100};
-                
+
         this.bodyBuilder = new BodyBuilder({
             world: this.world,
             cosmosManager: this.opts.cosmosManager,
             assetManager: this.opts.assetManager,
             config: this.opts.config
         });
+
+        this.thingFinder = new ThingFinder({
+            fe: this.fe
+        });
     },
-    
+
     syncThingFromBody: function(thing, dt) {
         thing.l = thing.body.GetPosition();
         thing.a = thing.body.GetAngle();
@@ -55,23 +60,23 @@ var ModuleBox2d = ModuleAbstract.extend({
         moveThingEvent.dt = dt;
         this.fe.fd.dispatch(moveThingEvent);
     },
-    
+
     syncBodyFromThing: function(thing, dt) {
         thing.body.SetTransform(thing.l, thing.a);
     },
-    
+
     embody:  function(thing) {
         thing.body = this.bodyBuilder.makeBody(thing.plan, thing.moverConfig || {});
         thing.body.SetUserData(thing);
         this.syncBodyFromThing(thing, 0);
         return thing.body;
     },
-    
+
     makeLoopEdges: function(points, edgeThing) {
         if (!edgeThing) {
             throw new Error('edgeThing must be defined in makeLoopEdges');
         }
-        
+
         var bd = new b2.BodyDef();
         this.loopEdges = this.world.CreateBody(bd);
         this.loopEdges.SetUserData(edgeThing);
@@ -79,7 +84,7 @@ var ModuleBox2d = ModuleAbstract.extend({
         shape.CreateLoop(points, points.length);
         this.loopEdges.CreateFixture(shape, 0.0);
     },
-    
+
     /**
      * @param {RayAbstract} callback
      * @param {b2.Vec2} p1
@@ -93,7 +98,7 @@ var ModuleBox2d = ModuleAbstract.extend({
     },
 
     /**
-     * 
+     *
      * @param {RayAbstract} callback
      * @param {Thing} thing
      * @param float range

@@ -1,7 +1,5 @@
-"use strict";
-
 var cc = require('cc'),
-    ThingPlanHelper = require('flame/service/ThingPlanHelper')
+    ThingPlanHelper = require('flame/service/ThingPlanHelper');
 
 /**
  * opts:
@@ -11,9 +9,9 @@ var cc = require('cc'),
 var CosmosManager = function(opts) {
     this.opts = opts || {resources: {}};
     if (!this.opts.resources) {
-        this.opts.resources = {}
+        this.opts.resources = {};
     }
-    
+
     // opts.dirs is only supported in node.js
     if (this.opts.dirs) {
         var fs = require('fs');
@@ -30,11 +28,11 @@ var CosmosManager = function(opts) {
             }
         }
     }
-    
+
     this.thingPlanHelper = new ThingPlanHelper({
         cosmosManager: this
     });
-    
+
 };
 
 var _p = CosmosManager.prototype;
@@ -46,7 +44,7 @@ _p.getResource = function(path) {
     if (path.substring(path.length - 5) != '.json') {
         path += '.json';
     }
-    
+
     if (this.opts.resources[path]) {
         return this.opts.resources[path];
     } else if (typeof window == 'undefined') {
@@ -55,6 +53,13 @@ _p.getResource = function(path) {
     } else {
         throw new Error('Resource not found: ' + path);
     }
+};
+
+/**
+ * alias
+ */
+_p.get = function(path) {
+    return this.getResource(path);
 };
 
 _p.identifyPlan = function(plan) {
@@ -69,7 +74,7 @@ _p.getAllAssets = function() {
     for (var i in this.opts.resources) {
         result = result.concat(this.thingPlanHelper.getPlanAssets(this.opts.resources[i]));
     }
-    
+
     // array_unique
     return result.filter(
         function(val, i, arr)

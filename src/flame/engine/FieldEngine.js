@@ -5,10 +5,10 @@ var cc = require('cc'),
 var stepEvent = {type: 'step', dt: 0},
     prestepEvent = {type: 'prestep', dt: 0},
     poststepEvent = {type: 'poststep', dt: 0};
-    
+
 
 var FieldEngine = cc.Class.extend({
-    
+
     /**
      * opts:
      * * config
@@ -19,43 +19,32 @@ var FieldEngine = cc.Class.extend({
      *    * cocos
      *      * viewport
      *      * stateBuilder
-     * 
+     *
      * @param opts object
      */
     ctor: function(opts) {
 
         this.opts = opts || {};
-        
+
         /**
          * space for mixins
          */
         this.m = {};
-        
+
         /**
          * sum of all dt since start of the engine
          */
         this.timeSum = 0;
-        
+
         this.fd = new EventDispatcher();
         this.field = new Field();
-                        
-        if (opts.mixins) {
-            if (opts.mixins.box2d) {
-                var mixinBox2d = require('flame/engine/MixinBox2d');
-                mixinBox2d(this);
-            }
-            if (opts.mixins.cocos) {
-                var mixinCocos = require('flame/engine/MixinCocos');
-                mixinCocos(this);
-            }
-        }
     },
 
     registerModule: function(module, name) {
         this.m[name] = module;
         module.injectFe(this, name);
     },
-    
+
     step: function(dt) {
         stepEvent.dt = prestepEvent.dt = poststepEvent.dt = dt;
         this.timeSum += dt;
@@ -70,7 +59,7 @@ var FieldEngine = cc.Class.extend({
             thing: thing
         });
     },
-    
+
     injectField: function(f) {
         for (var i =0; i < f.things.length; i++) {
             this.injectThing(f.things[i]);
