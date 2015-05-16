@@ -16,18 +16,32 @@ var StateBuilder = function(opts) {
 
 var _p = StateBuilder.prototype;
 
-_p.makeState = function(nodeBunchPlan, stateName, parentState) {
+_p.inlcudeNodePlans = function(includeTo, includeDef, stateName) {
+    var plan = this.opts.nb.opts.cosmosManager.get(includeDef.planSrc),
+        includeState = includeDef.state || stateName,
+        state = this.makeState(plan, includeState);
+    for (var i in state.nodes) {
+        includeTo.nodes[i] = state.nodes[i];
+    }
+};
+
+_p.makeState = function(thingPlan, stateName, parentState) {
     var state = {nodes: {}};
-    if (!nodeBunchPlan.states[stateName]) {
+    if (!thingPlan.states[stateName]) {
         throw new Error('unknown state "' + stateName + '"');
     }
 
-    for (var i in nodeBunchPlan.states[stateName]) {
+    for (var i in thingPlan.states[stateName]) {
         // treat nodeId starting with underscore, as comments
         if (i.substring(0,1) == '_') {
             continue;
         }
-        var plan = nodeBunchPlan.states[stateName][i],
+        if (i == '$include') {
+            this.inlcudeNodePlans(state, thingPlan.states[stateName][i], stateName);
+            continue;
+        }
+
+        var plan = thingPlan.states[stateName][i],
             node;
 
         plan.name = i;

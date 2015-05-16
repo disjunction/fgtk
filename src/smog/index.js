@@ -6,10 +6,10 @@ exports.entity.Player = require('./entity/Player');
 
 module.exports = {
     EMPTY: {},
-
-    app: new (require('./app/App')),
+    app: require('./app'),
     util: {
         EventDispatcher: require('./util/EventDispatcher'),
+        SchedulingQueue: require('./util/SchedulingQueue'),
         UidGenerator: require('./util/UidGenerator'),
         geo: require('./util/geo'),
         util: require('./util/util')

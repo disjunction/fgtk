@@ -1,4 +1,5 @@
-/*jslint node: true */ "use strict";
+/*jslint node: true */
+"use strict";
 
 var cc = require('cc'),
     Field = require('flame/entity/Field'),
@@ -69,7 +70,8 @@ var FieldEngine = cc.Class.extend({
     },
 
 	removeThing: function(thing) {
-        this.fd.dispatch('removeThing', {
+        this.fd.dispatch({
+            type: 'removeThing',
             thing: thing
         });
 

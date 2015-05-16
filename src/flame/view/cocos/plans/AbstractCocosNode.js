@@ -1,8 +1,19 @@
 /*jslint node: true */
 "use strict";
 
-var cc = require('cc'),
-    RemoveThingNode = require('flame/view/cocos/action/RemoveThingNode');
+var cc = require('cc');
+
+
+// this only exists in a real cocos environment, because it extends form Actions
+var customActionMap;
+if (cc.ActionInstant) {
+    customActionMap = {
+        removeThingNode: require('flame/view/cocos/action/RemoveThingNode'),
+        playEffect: require('flame/view/cocos/action/PlayEffect')
+    };
+} else {
+    customActionMap = {};
+}
 
 var AbstractCocosNode = cc.Class.extend({
     ctor: function(opts) {
@@ -57,9 +68,11 @@ var AbstractCocosNode = cc.Class.extend({
                     return groupAction(cc.sequence, def[1]);
                 case 'animate':
                     return makeFrameAnimation(def[1]);
-                case 'removeThingNode':
-                    return new RemoveThingNode();
             }
+            if (customActionMap[def[0]]) {
+                return customActionMap[def[0]].create.apply(cc, def[1]);
+            }
+
 
             if (!def[0] || !cc[def[0]]) {
                 throw new Error('bad action ' + def[0]);

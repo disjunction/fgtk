@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var EventDispatcher = function() {
@@ -42,6 +43,6 @@ EventDispatcher.prototype.removeListener = function(type, listener){
             }
         }
     }
-}
+};
 
 module.exports = EventDispatcher;

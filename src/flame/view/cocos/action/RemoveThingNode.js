@@ -1,4 +1,5 @@
-/*jslint node: true */ "use strict";
+/*jslint node: true */
+"use strict";
 
 var cc = require('cc');
 
@@ -11,13 +12,11 @@ var RemoveThingNode = cc.ActionInstant.extend({
         }
     },
     update:function(dt){
-        if (this.target.backlink && this.target.backlink.state) {
-            //this.target.backlink.state.nodes) {
-            //
-            //}
+        var b = this.target.backlink;
+        if (b && b.thing && b.thing.state && b.thing.state.nodes) {
+            delete b.thing.state.nodes[this.target.plan.name];
         }
-
-        //this.target.removeFromParent(this._isNeedCleanUp);
+        this.target.removeFromParent(this._isNeedCleanUp);
     },
     /**
      * Initialization of the node, please do not call this function by yourself, you should pass the parameters to constructor to initialize it.
@@ -35,5 +34,9 @@ var RemoveThingNode = cc.ActionInstant.extend({
         return new RemoveThingNode(this._isNeedCleanUp);
     }
 });
+
+RemoveThingNode.create = function(effectSrc) {
+    return new RemoveThingNode();
+};
 
 module.exports = RemoveThingNode;
