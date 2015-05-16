@@ -27,6 +27,9 @@ module.exports = {
             FabricViewport: require('./view/fabric/FabricViewport')
         },
         cocos: {
+            action: {
+                RemoveThingNode: require('./view/cocos/action/RemoveThingNode'),
+            },
             CocosNodeBuilder: require('./view/cocos/CocosNodeBuilder'),
             CocosViewport: require('./view/cocos/CocosViewport')
         }

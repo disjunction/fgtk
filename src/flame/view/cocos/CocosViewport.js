@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var cc = require('cc'),
@@ -46,7 +47,7 @@ _p.initLayers = function () {
 };
 
 _p.runScene = function (opts) {
-    var opts = opts || {};
+    opts = opts || {};
     var me = this;
 
     var resources = opts.preload || [];
@@ -148,9 +149,10 @@ _p.applyAnimation = function (node) {
 };
 
 _p.addNodeToLayer = function (node, layerId) {
-    Viewport.prototype.addNodeToLayer.call(this, node, layerId);
+    if (!node.getParent()) {
+        Viewport.prototype.addNodeToLayer.call(this, node, layerId);
+    }
     this.applyAnimation(node);
-
 };
 
 _p.initAudio = function() {

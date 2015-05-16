@@ -26,6 +26,13 @@ var ModuleBox2d = ModuleAbstract.extend({
             this.embody(thing);
         }.bind(this));
 
+        this.fe.fd.addListener('removeThing', function(event) {
+            var thing = event.thing;
+            if (thing.body) {
+                this.world.DestroyBody(thing.body);
+            }
+        }.bind(this));
+
         this.fe.fd.addListener('step', function(event) {
             this.world.Step(event.dt, 8, 3);
             for (var i = 0; i < this.fe.field.things.length; i++) {

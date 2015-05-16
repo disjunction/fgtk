@@ -1,3 +1,5 @@
+/*jslint node: true */ "use strict";
+
 var cc = require('cc'),
     Field = require('flame/entity/Field'),
     EventDispatcher = require('smog/util/EventDispatcher');
@@ -64,7 +66,32 @@ var FieldEngine = cc.Class.extend({
         for (var i =0; i < f.things.length; i++) {
             this.injectThing(f.things[i]);
         }
-    }
+    },
+
+	removeThing: function(thing) {
+        this.fd.dispatch('removeThing', {
+            thing: thing
+        });
+
+		// remove from field
+		this.field.remove(thing);
+
+/*
+		// remove from world
+		if (thing.body) {
+			this.world.DestroyBody(body);
+			this.remove(thing.bodyId);
+		}
+
+		if (thing.group && this.groups[thing.group]) {
+			delete this.groups[thing.group][thing.ii];
+		}
+
+		if (!leaveNodes && this.nodeBuilder) {
+			this.nodeBuilder.destroyNodes(thing);
+		}
+*/
+	},
 });
 
 module.exports = FieldEngine;

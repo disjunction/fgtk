@@ -1,3 +1,6 @@
+/*jslint node: true */
+"use strict";
+
 var cc = require('cc'),
     geo = require('smog').util.geo,
     ModuleAbstract = require('./ModuleAbstract');
@@ -25,6 +28,32 @@ var ModuleCocos = ModuleAbstract.extend({
 
         this.config = config;
     },
+    getContainerNode: function(thing, containerName) {
+        if (!thing.state.nodes[containerName]) {
+            if (!this.opts.containerPlans || !this.opts.containerPlans[containerName]) {
+                throw new Error('trying to get an unknown container: ' + containerName);
+            }
+            var plan = this.opts.containerPlans[containerName],
+                container = this.opts.viewport.opts.nb.makeNode(plan);
+            this.opts.viewport.addNodeToLayer(container);
+            thing.state.nodes[containerName] = container;
+        }
+        return thing.state.nodes[containerName];
+    },
+    attachNodeToContainerNode: function(node, thing, localL, containerName) {
+        var container = this.getContainerNode(thing, containerName);
+        node.setPosition(cc.pMult(localL, this.fe.opts.config.ppm));
+        container.addChild(node);
+        this.opts.viewport.applyAnimation(node);
+    },
+    attachStateToContainerNode: function(state, thing, localL, containerName) {
+        for (var i in state.nodes) {
+            this.attachNodeToContainerNode(state.nodes[i], thing, localL, containerName);
+
+            // currently not needed, as removeSelf should suffice
+            // this.setupNodeForThing(state.nodes[i], thing);
+        }
+    },
 
     injectFe: function(fe, name) {
         ModuleAbstract.prototype.injectFe.call(this, fe, name);
@@ -33,6 +62,10 @@ var ModuleCocos = ModuleAbstract.extend({
             thing = event.extra.thing;
             if (!thing.plan) return;
             this.envision(thing);
+        }.bind(this));
+
+        this.fe.fd.addListener('removeThing', function(event) {
+            this.removeThing(event.thing);
         }.bind(this));
 
         this.fe.fd.addListener('moveThing', function(event) {
@@ -47,12 +80,21 @@ var ModuleCocos = ModuleAbstract.extend({
             }
         }.bind(this));
     },
-
-    envision: function(thing) {
-        var stateName = thing.s || 'basic';
-        var state = this.opts.stateBuilder.makeState(thing.plan, stateName);
-        thing.state = state;
-
+    removeThing: function(thing) {
+        if (!thing.state) return;
+        for (var i in thing.state.nodes) {
+            thing.state.nodes[i].removeFromParent();
+        }
+        thing.state = null;
+    },
+    setupNodeForThing: function(node, thing) {
+        if (node.plan.ani && node.plan.ani[0] == 'sequence' && node.plan.ani[1][node.plan.ani[1].length -1][0] == 'removeThingNode') {
+            node.backlink = {
+                thing: thing
+            };
+        }
+    },
+    applyState: function(thing) {
         // set thingShift vectors where needed
         // thingShift defines distance and angle of this node, relative to Thing origin
         for (var i in thing.state.nodes) {
@@ -64,14 +106,37 @@ var ModuleCocos = ModuleAbstract.extend({
                     a: cc.pToAngle(nodePoint)
                 };
             }
+
+            this.setupNodeForThing(node, thing);
         }
 
         this.syncStateFromThing(thing);
 
-        this.opts.viewport.addStateToLayer(state);
+        this.opts.viewport.addStateToLayer(thing.state);
+    },
+
+    envision: function(thing) {
+        var stateName = thing.s || 'basic';
+        var state = this.opts.stateBuilder.makeState(thing.plan, stateName);
+        thing.state = state;
+        this.applyState(thing);
+    },
+
+    changeState: function(thing, newState) {
+        var state = this.opts.stateBuilder.makeState(thing.plan, newState, thing.state);
+        for (var i in thing.state.nodes) {
+            if (thing.state.nodes[i].inherited) {
+                thing.state.nodes[i].inherited = false;
+            } else {
+                thing.state.nodes[i].removeFromParent();
+            }
+        }
+        thing.state = state;
+        this.applyState(thing);
     },
 
     syncStateFromThing: function(thing) {
+        if (!thing.state) return;
         for (var i in thing.state.nodes) {
             node = thing.state.nodes[i];
 

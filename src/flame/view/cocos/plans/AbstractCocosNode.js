@@ -1,6 +1,8 @@
+/*jslint node: true */
 "use strict";
 
-var cc = require('cc');
+var cc = require('cc'),
+    RemoveThingNode = require('flame/view/cocos/action/RemoveThingNode');
 
 var AbstractCocosNode = cc.Class.extend({
     ctor: function(opts) {
@@ -10,21 +12,21 @@ var AbstractCocosNode = cc.Class.extend({
     },
     applyPlan: function(plan, node) {
         if (plan.a) node.setRotation(plan.a);
-        
+
         var x = plan.x || 0;
         var y = plan.y || 0;
         node.setPositionX(x);
         node.setPositionY(y);
-        
+
         var a = plan.a || 0;
         node.setRotation(a);
-        
+
         if (plan.alpha) node.setOpacity(plan.alpha / 100);
-        
+
         var s = this.opts.cosmosManager.thingPlanHelper.getNodeScale(plan);
         if (s) {
             if (s.x) node.setScaleX(s.x);
-            if (s.y) node.setScaleY(s.y);        
+            if (s.y) node.setScaleY(s.y);
         }
     },
     roundCoord: function(v) {
@@ -46,16 +48,17 @@ var AbstractCocosNode = cc.Class.extend({
             }
             return cc.animate(new cc.Animation(plan.spriteCache.frames, def[0]));
         }
-        
+
         function makeAction(def) {
-            if (def[0] == 'spawn') {
-                return groupAction(cc.spawn, def[1]);
-            }
-            if (def[0] == 'sequence') {
-                return groupAction(cc.sequence, def[1]);
-            }
-            if (def[0] == 'animate') {
-                return makeFrameAnimation(def[1]);
+            switch (def[0]) {
+                case 'spawn':
+                    return groupAction(cc.spawn, def[1]);
+                case 'sequence':
+                    return groupAction(cc.sequence, def[1]);
+                case 'animate':
+                    return makeFrameAnimation(def[1]);
+                case 'removeThingNode':
+                    return new RemoveThingNode();
             }
 
             if (!def[0] || !cc[def[0]]) {
@@ -67,9 +70,8 @@ var AbstractCocosNode = cc.Class.extend({
             } else {
                 return cc[def[0]].apply(cc, def[1]);
             }
-
-            return action;
         }
+
         function groupAction(groupFunction, def) {
             var array = [];
             for (var i = 0; i < def.length; i++) {
@@ -80,7 +82,6 @@ var AbstractCocosNode = cc.Class.extend({
             }
             return groupFunction(array);
         }
-
         return makeAction(ani);
     }
 });
