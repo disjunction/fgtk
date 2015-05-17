@@ -1,6 +1,6 @@
 var cc = require('cc'),
     b2 = require('jsbox2d'),
-    rof = require('flame/rof'),
+    core = require('flame/rof/core'),
     AbstractChasis = require('flame/rof/chasis/AbstractChasis');
 
 // temp reusable objects
@@ -12,35 +12,51 @@ var TrackChasis = AbstractChasis.extend({
     applyState: function(mover, interState) {
         mover.i = interState;
     },
-    
+
     initMover: function(thing, mover) {
         AbstractChasis.prototype.initMover.call(this, thing, mover);
     },
-    
+
     driveBody: function(body, mover) {
         config = mover.config;
         angle = body.GetAngle();
-              
-        if (mover.i[rof.TURN_LEFT] && config.wheelTorque) {
+
+        var enginePoint, force;
+
+        if (!mover.i) return;
+
+        if (mover.i[core.TURN_LEFT] && config.wheelTorque) {
+            if (!isFinite(config.wheelTorque)) {
+                throw new Error('wheelTorque is not finite');
+            }
             body.ApplyTorque(config.wheelTorque, true);
         }
-        
-        if (mover.i[rof.TURN_RIGHT] && config.wheelTorque) {
+
+        if (mover.i[core.TURN_RIGHT] && config.wheelTorque) {
+            if (!isFinite(config.wheelTorque)) {
+                throw new Error('wheelTorque is not finite');
+            }
             body.ApplyTorque(-config.wheelTorque, true);
         }
-        
-        if (mover.i[rof.ACCELERATE]) {            
+
+        if (mover.i[core.ACCELERATE]) {
             strength = config.accelForward;
-            v1.Set(mover.config.engineX, 0);
-            var point = body.GetWorldCenter();
-            var force = v1.Set(strength * Math.cos(angle), strength * Math.sin(angle));
-            body.ApplyForce(force, point, true);
-        } else if (mover.i[rof.DECELERATE]) {
+            if (!isFinite(strength)) {
+                throw new Error('accelForward is not finite');
+            }
+            v1.Set(mover.config.engineShiftX, 0);
+            enginePoint = body.GetWorldCenter();
+            force = v1.Set(strength * Math.cos(angle), strength * Math.sin(angle));
+            body.ApplyForce(force, enginePoint, true);
+        } else if (mover.i[core.DECELERATE]) {
             strength = config.accelBackward;
-            v1.Set(mover.config.engineX, 0);
-            var point = body.GetWorldCenter();
-            var force = v1.Set(-strength * Math.cos(angle), -strength * Math.sin(angle));
-            body.ApplyForce(force, point, true);
+            if (!isFinite(strength)) {
+                throw new Error('accelBackward is not finite');
+            }
+            v1.Set(mover.config.engineShiftX, 0);
+            enginePoint = body.GetWorldCenter();
+            force = v1.Set(-strength * Math.cos(angle), -strength * Math.sin(angle));
+            body.ApplyForce(force, enginePoint, true);
         }
     }
 });

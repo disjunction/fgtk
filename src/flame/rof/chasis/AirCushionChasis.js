@@ -1,6 +1,6 @@
 var cc = require('cc'),
     b2 = require('jsbox2d'),
-    rof = require('flame/rof'),
+    core = require('flame/rof/core'),
     AbstractChasis = require('flame/rof/chasis/AbstractChasis');
 
 // temp reusable objects
@@ -12,7 +12,7 @@ var AirCushionChasis = AbstractChasis.extend({
     applyState: function(mover, interState) {
         mover.i = interState;
     },
-    
+
     initMover: function(thing, mover) {
         AbstractChasis.prototype.initMover.call(this, thing, mover);
         config = mover.config;
@@ -20,26 +20,26 @@ var AirCushionChasis = AbstractChasis.extend({
             mover.engineAngleRad = config.engineAngle / 180 * Math.PI;
         }
     },
-    
+
     driveBody: function(body, mover) {
         config = mover.config;
         angle = body.GetAngle();
-              
-        if (mover.i[rof.TURN_LEFT] && config.wheelTorque) {
+
+        if (mover.i[core.TURN_LEFT] && config.wheelTorque) {
             body.ApplyTorque(config.wheelTorque);
         }
-        
-        if (mover.i[rof.TURN_RIGHT] && config.wheelTorque) {
+
+        if (mover.i[core.TURN_RIGHT] && config.wheelTorque) {
             body.ApplyTorque(-config.wheelTorque);
         }
-        
-        if (mover.i[rof.ACCELERATE]) {
-            
-            if (mover.i[rof.TURN_RIGHT] && mover.engineAngleRad) {
+
+        if (mover.i[core.ACCELERATE]) {
+
+            if (mover.i[core.TURN_RIGHT] && mover.engineAngleRad) {
                 angle += mover.engineAngleRad;
             }
 
-            if (mover.i[rof.TURN_LEFT] && mover.engineAngleRad) {
+            if (mover.i[core.TURN_LEFT] && mover.engineAngleRad) {
                 angle -= mover.engineAngleRad;
             }
 
@@ -48,7 +48,7 @@ var AirCushionChasis = AbstractChasis.extend({
             var point = body.GetWorldPoint(v1);
             var force = v1.Set(strength * Math.cos(angle), strength * Math.sin(angle));
             body.ApplyForce(force, point, true);
-        } else if (mover.i[rof.DECELERATE]) {
+        } else if (mover.i[core.DECELERATE]) {
             strength = config.accelBackward;
             v1.Set(mover.config.engineX, 0);
             var point = body.GetWorldPoint(v1);

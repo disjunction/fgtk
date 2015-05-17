@@ -1,5 +1,6 @@
 var b2 = require('jsbox2d'),
     cc = require('cc'),
+    smog = require('smog'),
     BodyBuilder = require('flame/engine/BodyBuilder'),
     ThingFinder = require('flame/service/ThingFinder'),
     ModuleAbstract = require('./ModuleAbstract');
@@ -73,7 +74,7 @@ var ModuleBox2d = ModuleAbstract.extend({
     },
 
     embody:  function(thing) {
-        thing.body = this.bodyBuilder.makeBody(thing.plan, thing.moverConfig || {});
+        thing.body = this.bodyBuilder.makeBody(thing.plan, thing.bodyExtra || thing.plan.body);
         thing.body.SetUserData(thing);
         this.syncBodyFromThing(thing, 0);
         return thing.body;
@@ -99,7 +100,7 @@ var ModuleBox2d = ModuleAbstract.extend({
      */
     rayCast: function(callback, p1, p2) {
         callback.reset();
-        this.world.RayCast(callback, p1, p2)
+        this.world.RayCast(callback, p1, p2);
         callback.muzzlePoint = p1;
         callback.missPoint = p2;
     },

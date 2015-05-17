@@ -7,8 +7,18 @@ describe('smog.util.util', function() {
             o3 = {'a': 456},
             a = [o1, o2, o3];
 
-        util.removeOneFromArray(12, a);
-        o1.zz = 454;
-        console.log(a);
+        util.removeOneFromArray(o2, a);
+        expect(a.length).toBe(2);
+    });
+
+    it('check: combineObjects()', function() {
+        var o1 = {'z': 123, 'a': 1123},
+            o2 = {'b': 5, 'z': 45},
+            o3 = util.combineObjects(o1, o2);
+        expect(o3).toEqual({
+            a: 1123,
+            b:5,
+            z: 45
+        });
     });
 });

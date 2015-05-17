@@ -1,12 +1,13 @@
+/*jslint node: true */
+"use strict";
+
 var cc = require('cc'),
-    b2 = require('jsbox2d'),
-    rof = require('flame/rof');
+    b2 = require('jsbox2d');
 
 var chasisMapping = {
     airCushion: require('flame/rof/chasis/AirCushionChasis'),
     track: require('flame/rof/chasis/TrackChasis')
 };
-
 
 var Driver = cc.Class.extend({
     /**
@@ -16,7 +17,7 @@ var Driver = cc.Class.extend({
      */
     ctor: function(opts) {
         this.opts = opts || {};
-        
+
         // convert classes into objects, injecting driver options
         for (var i in chasisMapping) {
             if (typeof chasisMapping[i] == 'function') {
@@ -24,29 +25,28 @@ var Driver = cc.Class.extend({
             }
         }
     },
-    
+
     makeMover: function(thing, config) {
         var mover = {config: config};
         mover.chasis = chasisMapping[config.chasis];
         if (!mover.chasis) {
             throw new Error('unexecpected chasis for mover: "' + mover.chasis + '"');
         }
-        mover.chasis.initMover(thing, mover)
+        mover.chasis.initMover(thing, mover);
         return mover;
     },
-    
+
     drive: function(thing, driveOn) {
         var interState = thing.i,
             mover = thing.mover,
             chasis = mover.chasis;
-        
+
         if (!driveOn) {
             chasis.applyState(mover, interState);
         }
-        
+
         chasis.driveBody(thing.body, mover);
     }
 });
-
 
 module.exports = Driver;

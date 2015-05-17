@@ -3,7 +3,7 @@ function fuzzyEqual(v1, v2) {
     return Math.abs(v1 - v2) < 0.0001;
 }
 
-describe('util.geo', function() {
+describe('smog.util.geo', function() {
     it('check: closestRotation()', function() {
         expect(geo.closestRotation(0.3, 0.8)).toBe(0.5);
         expect(geo.closestRotation(0.8, 0.3)).toBe(-0.5);

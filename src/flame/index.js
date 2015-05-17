@@ -14,7 +14,8 @@ module.exports = {
         Field: require('./entity/Field')
     },
     rof: {
-        Driver: require('./rof/Driver')
+        Driver: require('./rof/Driver'),
+        core: require('./rof/core'),
     },
     view: {
         Viewport: require('./view/Viewport'),
