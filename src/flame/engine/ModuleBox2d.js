@@ -33,7 +33,7 @@ var ModuleBox2d = ModuleAbstract.extend({
             }
         }.bind(this));
 
-        this.fe.fd.addListener('step', function(event) {
+        this.fe.fd.addListener('simStepCall', function(event) {
             this.world.Step(event.dt, 8, 3);
             for (var i = 0; i < this.fe.field.things.length; i++) {
                 var thing = this.fe.field.things[i];

@@ -7,6 +7,11 @@ var cc = require('cc'),
 
 var x,y,node,thing;
 
+var events = {
+    renderCall: {type: "renderCall", dt: 0},
+    renderEnd: {type: "renderEnd", dt: 0}
+};
+
 /**
  * opts:
  * * viewport
@@ -72,12 +77,17 @@ var ModuleCocos = ModuleAbstract.extend({
             this.syncStateFromThing(event.thing);
         }.bind(this));
 
-        this.fe.fd.addListener('step', function(event) {
+        this.fe.fd.addListener('loopEnd', function(event) {
+            this.fe.setDtAndDispatch(event.dt, events.renderCall);
+
             for (var i = 0; i < this.fe.field.things.length; i++) {
                 thing = this.fe.field.things[i];
                 if (!thing.state || thing.plan.static) continue;
                 this.syncStateFromThing(thing);
             }
+
+            this.fe.setDtAndDispatch(event.dt, events.renderEnd);
+
         }.bind(this));
     },
     removeThing: function(thing) {
@@ -156,9 +166,6 @@ var ModuleCocos = ModuleAbstract.extend({
 
             x = x *  this.config.ppm;
             y = y *  this.config.ppm;
-
-            //x = (node.plan.x || 0) + x *  this.config.ppm;
-            //y = (node.plan.y || 0) + y * this.config.ppm;
 
             if (node.plan.round) {
                 x = Math.round(x);

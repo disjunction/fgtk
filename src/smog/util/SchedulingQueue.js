@@ -48,6 +48,8 @@ _p.fetch = function(time) {
 /**
  * can be optimized when etire queue is fetched,
  * but why add complexity?
+ *
+ * NO BIG SPLICE! see - http://jsperf.com/multiple-shift-vs-single-splice/4
  */
 _p.fetchArray = function(time) {
     var message,

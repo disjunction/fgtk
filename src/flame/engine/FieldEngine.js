@@ -3,12 +3,19 @@
 
 var cc = require('cc'),
     Field = require('flame/entity/Field'),
-    EventDispatcher = require('smog/util/EventDispatcher');
+    EventDispatcher = require('smog/util/EventDispatcher'),
+    SchedulingQueue = require('smog/util/SchedulingQueue'),
+    EventScheduler = require('smog/util/EventScheduler');
 
-var stepEvent = {type: 'step', dt: 0},
-    prestepEvent = {type: 'prestep', dt: 0},
-    poststepEvent = {type: 'poststep', dt: 0};
-
+// reusable event objects. We're avoiding creating new objects this way
+var events = {
+    loopCall: {type: 'loopCall', dt: 0},
+    simCall: {type: 'simCall', dt: 0},
+    simStepCall: {type: 'simStepCall', dt: 0, step: 0},
+    simStepEnd: {type: 'simStepEnd', dt: 0, step: 0},
+    simEnd: {type: 'simEnd', dt: 0},
+    loopEnd: {type: 'loopEnd', dt: 0}
+};
 
 var FieldEngine = cc.Class.extend({
 
@@ -17,12 +24,6 @@ var FieldEngine = cc.Class.extend({
      * * config
      * * cosmosManager
      * * assetManager
-     * * mixins
-     *    * box2d
-     *    * cocos
-     *      * viewport
-     *      * stateBuilder
-     *
      * @param opts object
      */
     ctor: function(opts) {
@@ -40,7 +41,12 @@ var FieldEngine = cc.Class.extend({
         this.timeSum = 0;
 
         this.fd = new EventDispatcher();
+        this.scheduler = new EventScheduler(this.fd, new SchedulingQueue());
         this.field = new Field();
+
+        this.simAccumulator = 0;
+        this.simStep = 0.02;
+        this.simSum = 0;
     },
 
     registerModule: function(module, name) {
@@ -48,12 +54,35 @@ var FieldEngine = cc.Class.extend({
         module.injectFe(this, name);
     },
 
+    setDtAndDispatch: function(dt, event) {
+        event.dt = dt;
+        this.fd.dispatch(event);
+    },
+
     step: function(dt) {
-        stepEvent.dt = prestepEvent.dt = poststepEvent.dt = dt;
+        var self = this;
+
         this.timeSum += dt;
-        this.fd.dispatch(prestepEvent);
-        this.fd.dispatch(stepEvent);
-        this.fd.dispatch(poststepEvent);
+
+        this.setDtAndDispatch(dt, events.loopCall);
+        this.setDtAndDispatch(dt, events.simCall);
+
+        this.simAccumulator += dt;
+        var simSteps = Math.floor(this.simAccumulator / this.simStep);
+        for (var i = 0; i < simSteps; i++) {
+            events.simStepCall.step = i;
+            this.setDtAndDispatch(this.simStep, events.simStepCall);
+
+            this.scheduler.advance(this.simStep);
+
+            events.simStepEnd.step = i;
+            this.setDtAndDispatch(this.simStep, events.simStepEnd);
+
+            this.simAccumulator -= this.simStep;
+        }
+
+        this.setDtAndDispatch(dt, events.simEnd);
+        this.setDtAndDispatch(dt, events.loopEnd);
     },
 
     injectThing: function(thing) {
