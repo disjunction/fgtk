@@ -33,9 +33,14 @@ module.exports = {
         }
     },
     service: {
+        serialize: {
+            AbstractSerializer: require('./service/serialize/AbstractSerializer'),
+            ThingSerializer: require('./service/serialize/ThingSerializer')
+        },
         CosmosManager: require('./service/CosmosManager'),
         ThingBuilder: require('./service/ThingBuilder'),
         ThingPlanHelper: require('./service/ThingPlanHelper'),
         ThingFinder: require('./service/ThingFinder')
-    }
+    },
+
 };

@@ -14,6 +14,7 @@ var CosmosManager = function(opts) {
 
     // opts.dirs is only supported in node.js
     if (this.opts.dirs) {
+        var jsonlint = require('jsonlint');
         var fs = require('fs');
         var dirs = this.opts.dirs;
         for (var i = 0; i < dirs.length; i++) {
@@ -24,7 +25,11 @@ var CosmosManager = function(opts) {
             for (var j = 0; j < fileList.length; j++) {
                 var fileName = fileList[j].substring(dir.length + 1),
                     fileContents = fs.readFileSync(dir + '/' + fileName, "utf8");
-                this.opts.resources[fileName] = JSON.parse(fileContents);
+                try {
+                    this.opts.resources[fileName] = jsonlint.parse(fileContents);
+                } catch (e) {
+                    console.log('failed parsing ' + fileName + ' : ' + e);
+                }
             }
         }
     }
@@ -45,14 +50,19 @@ _p.getResource = function(path) {
         path += '.json';
     }
 
+    var result;
     if (this.opts.resources[path]) {
-        return this.opts.resources[path];
+        result = this.opts.resources[path];
     } else if (typeof window == 'undefined') {
-        this.opts.resources[path] = require(path);
+        result = this.opts.resources[path] = require(path);
         return this.opts.resources[path];
     } else {
         throw new Error('Resource not found: ' + path);
     }
+    if (result.from === undefined) {
+        result.from = path;
+    }
+    return result;
 };
 
 /**

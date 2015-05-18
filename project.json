@@ -1,6 +1,7 @@
 {
     "name": "fgtk",
     "dependencies": {
-        "exec-sync": "*"
+        "exec-sync": "*",
+        "jsonlint": "*"
     }
 }
