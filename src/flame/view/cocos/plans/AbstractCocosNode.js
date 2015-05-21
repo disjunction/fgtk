@@ -57,7 +57,16 @@ var AbstractCocosNode = cc.Class.extend({
             if (!plan.spriteCache) {
                 throw new Error('spriteCache not found. Calling animate on non-sprite?');
             }
-            return cc.animate(new cc.Animation(plan.spriteCache.frames, def[0]));
+            var frames;
+            if (def.length < 2) {
+                frames = plan.spriteCache.frames;
+            } else {
+                frames = [];
+                for (var i = 0; i < def[1].length; i++) {
+                    frames.push(plan.spriteCache.frames[def[1][i]]);
+                }
+            }
+            return cc.animate(new cc.Animation(frames, def[0]));
         }
 
         function makeAction(def) {
