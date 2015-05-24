@@ -143,8 +143,13 @@ _p.scrolledLocation2Target = function (point) {
 };
 
 _p.applyAnimation = function (node) {
+    if (node.currentAction) {
+        node.stopAction(node.currentAction);
+        delete node.currentAction;
+    }
     if (node.plan && node.plan.compiledAni) {
-        node.runAction(node.plan.compiledAni.copy());
+        node.currentAction = node.plan.compiledAni.copy();
+        node.runAction(node.currentAction);
     }
 };
 

@@ -69,6 +69,15 @@ var AbstractCocosNode = cc.Class.extend({
             return cc.animate(new cc.Animation(frames, def[0]));
         }
 
+        function repeat(def) {
+            var action = makeAction(def[2]);
+            if (def[1] == 'forever') {
+                return action.repeatForever();
+            } else {
+                return action.repeat(def[1]);
+            }
+        }
+
         function makeAction(def) {
             switch (def[0]) {
                 case 'spawn':
@@ -77,6 +86,8 @@ var AbstractCocosNode = cc.Class.extend({
                     return groupAction(cc.sequence, def[1]);
                 case 'animate':
                     return makeFrameAnimation(def[1]);
+                case 'repeat':
+                    return repeat(def);
             }
             if (customActionMap[def[0]]) {
                 return customActionMap[def[0]].create.apply(cc, def[1]);
@@ -97,9 +108,6 @@ var AbstractCocosNode = cc.Class.extend({
         function groupAction(groupFunction, def) {
             var array = [];
             for (var i = 0; i < def.length; i++) {
-                if (def[i][0] == "repeat") {
-                    continue;
-                }
                 array.push(makeAction(def[i]));
             }
             return groupFunction(array);

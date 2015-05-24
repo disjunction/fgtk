@@ -2,9 +2,9 @@
 "use strict";
 
 /**
- * Serialized thing consists of serial-packages in one object
- * - package is transferred as tuple [thingId, payload] - all numbers are rounded to 4th sign
- * - if payload is an object, then it contains packages
+ * Serialized thing consists of serial-bundles in one object
+ * - bundle is transferred as tuple [thingId, payload] - all numbers are rounded to 4th sign
+ * - if payload is an object, then it contains bundles
  * - trailing zero values are omitted, e.g. if thing doesn't move, then "p" contains not more than 3 elements
  * ["thingId", {
  *    // phisics object
@@ -35,7 +35,22 @@ var ThingSerializer = function(opts) {
 
 var _p = ThingSerializer.prototype;
 
-_p.makePhisicsPackage = function(thing, skipVelocity) {
+/**
+ * not using toFixed() because of this benchmark
+ * https://jsperf.com/parsefloat-tofixed-vs-math-round
+ */
+_p.outFloat = function(value) {
+    return Math.round(value * 10000) / 10000;
+};
+
+_p.cutTrailingZeros = function(value) {
+    while (value && value[value.length - 1] === 0) {
+        value.pop();
+    }
+    return value;
+};
+
+_p.makePhisicsBundle = function(thing, skipVelocity) {
     var result = [
         this.outFloat(thing.l.x),
         this.outFloat(thing.l.y),
@@ -57,7 +72,7 @@ _p.serializeInitial = function(thing) {
     return [
         thing.id,
         {
-            p: this.makePhisicsPackage(thing),
+            p: this.makePhisicsBundle(thing),
             planSrc: thing.plan.from
         }
     ];

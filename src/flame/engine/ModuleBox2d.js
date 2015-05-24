@@ -40,6 +40,7 @@ var ModuleBox2d = ModuleAbstract.extend({
                 var thing = this.fe.field.things[i];
                 if (thing.body && thing.body.IsAwake()) {
                     this.syncThingFromBody(thing, event.dt);
+                    this.fe.fd.dispatch(moveThingEvent);
                 }
             }
         }.bind(this));
@@ -66,7 +67,6 @@ var ModuleBox2d = ModuleAbstract.extend({
         thing.a = thing.body.GetAngle();
         moveThingEvent.thing = thing;
         moveThingEvent.dt = dt;
-        this.fe.fd.dispatch(moveThingEvent);
     },
 
     syncBodyFromThing: function(thing, dt) {

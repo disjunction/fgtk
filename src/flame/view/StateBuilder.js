@@ -41,20 +41,27 @@ _p.makeState = function(thingPlan, stateName, parentState) {
             continue;
         }
 
-        var plan = thingPlan.states[stateName][i],
+        var newNodePlan = thingPlan.states[stateName][i],
             node;
 
-        plan.name = i;
+        newNodePlan.name = i;
 
-        if (plan.inherit && parentState && parentState.nodes[plan.inherit]) {
-            node = parentState.nodes[plan.inherit];
-            if (plan.ani) {
-                node.plan.ani = plan.ani;
-                node.plan.compiledAni = AbstractCocosNode.prototype.compileAnimation.call(this, node.plan);
+        if (newNodePlan.inherit && parentState && parentState.nodes[newNodePlan.inherit]) {
+            node = parentState.nodes[newNodePlan.inherit];
+            if (newNodePlan.ani) {
+                node.plan.ani = newNodePlan.ani;
+                // cache the compiledAni in the newPlanNode, even if node.plan stays the same (inherited)
+                if (!newNodePlan.compiledAni) {
+                    newNodePlan.compiledAni = AbstractCocosNode.prototype.compileAnimation.call(this, node.plan);
+                }
+                node.plan.compiledAni = newNodePlan.compiledAni;
+            } else {
+                delete node.plan.ani;
+                delete node.plan.compiledAni;
             }
             node.inherited = true;
         } else {
-            node = this.opts.nb.makeNode(plan);
+            node = this.opts.nb.makeNode(newNodePlan);
         }
 
         state.nodes[i] = node;

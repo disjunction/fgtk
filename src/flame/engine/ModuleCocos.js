@@ -98,7 +98,10 @@ var ModuleCocos = ModuleAbstract.extend({
         thing.state = null;
     },
     setupNodeForThing: function(node, thing) {
-        if (node.plan.ani && node.plan.ani[0] == 'sequence' && node.plan.ani[1][node.plan.ani[1].length -1][0] == 'removeThingNode') {
+        if (node.plan.ani &&
+            node.plan.ani[0] == 'sequence' &&
+            node.plan.ani[1][node.plan.ani[1].length -1][0] == 'removeThingNode'
+        ) {                
             node.backlink = {
                 thing: thing
             };
@@ -129,6 +132,7 @@ var ModuleCocos = ModuleAbstract.extend({
         var stateName = thing.s || 'basic';
         var state = this.opts.stateBuilder.makeState(thing.plan, stateName);
         thing.state = state;
+        thing.stateName = stateName;
         this.applyState(thing);
     },
 
@@ -142,6 +146,7 @@ var ModuleCocos = ModuleAbstract.extend({
             }
         }
         thing.state = state;
+        thing.stateName = newState;
         this.applyState(thing);
     },
 

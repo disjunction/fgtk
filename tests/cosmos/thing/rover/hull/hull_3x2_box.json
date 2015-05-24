@@ -1,0 +1,19 @@
+{
+    "states" : {
+        "basic" : {
+            "main": {
+                "layer": "main",
+                "src": "unittest/placeholder_5x2.png"
+            }
+        }
+    },
+    "body" : {
+        "type": "box",
+        "size": {
+            "width": 2.25,
+            "height": 1.5
+        },
+        "linearDamping": 5,
+        "angularDamping": 7
+    }
+}
