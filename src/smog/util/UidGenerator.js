@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -25,10 +26,10 @@ function packInt(int) {
 function UidGenerator(prefix, seed) {
     this.prefix = prefix || '';
     this.counter = seed || 0;
-    
+
     this.getNext = function() {
-        return this.prefix + packInt(this.counter++)
-    }
+        return this.prefix + packInt(this.counter++);
+    };
 }
 
 module.exports = UidGenerator;

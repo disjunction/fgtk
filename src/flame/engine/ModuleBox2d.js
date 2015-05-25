@@ -60,6 +60,8 @@ var ModuleBox2d = ModuleAbstract.extend({
         this.thingFinder = new ThingFinder({
             fe: this.fe
         });
+
+        return this.world;
     },
 
     syncThingFromBody: function(thing, dt) {

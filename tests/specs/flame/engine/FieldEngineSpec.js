@@ -1,35 +1,7 @@
 var flame = require('flame'),
     FieldEngine = flame.engine.FieldEngine,
-    Thing = flame.entity.Thing;
-
-var makeFieldEngine = function() {
-    var am = new flame.view.AssetManager({resources: {
-            'unittest/placeholder_5x2.png' : {
-                width: 160,
-                height: 64
-            }
-        }});
-    var dir = __dirname + '/../../../cosmos',
-        cm = new flame.service.CosmosManager({
-            dirs: [
-                dir
-            ]
-        });
-    var fe = new FieldEngine({
-            config: {ppm: 32},
-            assetManager: am,
-            cosmosManager: cm,
-        });
-
-    fe.registerModule(new flame.engine.ModuleBox2d({
-        cosmosManager: cm,
-        assetManager: am,
-        config: {ppm: 32}
-    }), 'b');
-
-    return fe;
-};
-
+    Thing = flame.entity.Thing,
+    fixtures = require('fgtk_tu/fixtures');
 
 describe("FieldEngine", function() {
     it('can be created', function() {
@@ -38,12 +10,12 @@ describe("FieldEngine", function() {
     });
 
     it('basic box2d works', function() {
-        var fe = makeFieldEngine();
+        var fe = fixtures.makeFeBox2d();
         fe.m.b.makeWorld();
     });
 
     it('check: removeThing()', function() {
-        var fe = makeFieldEngine();
+        var fe = fixtures.makeFeBox2d();
         fe.m.b.makeWorld();
         var field = new flame.entity.Field(),
             thing1 = new Thing(),

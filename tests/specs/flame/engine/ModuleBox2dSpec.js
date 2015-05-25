@@ -4,7 +4,7 @@ var b2 = require('jsbox2d'),
     FieldEngine = flame.engine.FieldEngine;
 
 var makeFieldEngine = function() {
-    var am = new flame.view.AssetManager({resources: {
+    var am = new flame.service.AssetManager({resources: {
             'unittest/placeholder_5x2.png' : {
                 width: 160,
                 height: 64

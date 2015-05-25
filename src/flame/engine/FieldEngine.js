@@ -5,7 +5,8 @@ var cc = require('cc'),
     Field = require('flame/entity/Field'),
     EventDispatcher = require('smog/util/EventDispatcher'),
     SchedulingQueue = require('smog/util/SchedulingQueue'),
-    EventScheduler = require('smog/util/EventScheduler');
+    EventScheduler = require('smog/util/EventScheduler'),
+    UidGenerator = require('smog/util/UidGenerator');
 
 // reusable event objects. We're avoiding creating new objects this way
 var events = {
@@ -24,6 +25,7 @@ var FieldEngine = cc.Class.extend({
      * * config
      * * cosmosManager
      * * assetManager
+     * * uidGenerator
      * @param opts object
      */
     ctor: function(opts) {
@@ -47,6 +49,9 @@ var FieldEngine = cc.Class.extend({
         this.simAccumulator = 0;
         this.simStep = 0.02;
         this.simSum = 0;
+
+        // here "m" stands for "master"
+        this.uidGenerator = opts.uidGenerator || new UidGenerator('m');
     },
 
     registerModule: function(module, name) {
@@ -86,6 +91,9 @@ var FieldEngine = cc.Class.extend({
     },
 
     injectThing: function(thing) {
+        if (!thing.id) {
+            thing.id = this.uidGenerator.getNext();
+        }
         this.field.things.push(thing);
         this.fd.dispatch('injectThing', {
             thing: thing

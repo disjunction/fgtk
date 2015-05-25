@@ -1,3 +1,6 @@
+/*jslint node: true */
+"use strict";
+
 var cc = require('cc'),
     b2 = require('jsbox2d');
 

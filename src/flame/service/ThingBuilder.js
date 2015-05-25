@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var cc = require('cc'),
@@ -36,7 +37,7 @@ _p.makeThing = function(opts) {
         className = plan.class || 'Thing',
         classCtor = this.getClass(className),
         thing = new classCtor(opts);
-    
+
     return thing;
 };
 

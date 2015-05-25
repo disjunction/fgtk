@@ -1,6 +1,8 @@
 /*jslint node: true */
 "use strict";
 
+var AbstractSerializer = require('./AbstractSerializer');
+
 /**
  * Serialized thing consists of serial-bundles in one object
  * - bundle is transferred as tuple [thingId, payload] - all numbers are rounded to 4th sign
@@ -29,26 +31,13 @@
  * ]
  */
 
-var ThingSerializer = function(opts) {
-    this.opts = opts;
-};
+var ThingSerializer = AbstractSerializer.extend({
+    ctor: function(opts) {
+        AbstractSerializer.prototype.ctor.call(this, opts);
+    }
+});
 
 var _p = ThingSerializer.prototype;
-
-/**
- * not using toFixed() because of this benchmark
- * https://jsperf.com/parsefloat-tofixed-vs-math-round
- */
-_p.outFloat = function(value) {
-    return Math.round(value * 10000) / 10000;
-};
-
-_p.cutTrailingZeros = function(value) {
-    while (value && value[value.length - 1] === 0) {
-        value.pop();
-    }
-    return value;
-};
 
 _p.makePhisicsBundle = function(thing, skipVelocity) {
     var result = [
@@ -66,6 +55,10 @@ _p.makePhisicsBundle = function(thing, skipVelocity) {
         );
     }
     return this.cutTrailingZeros(result);
+};
+
+_p.makeIterstateBundle = function(thing, skipVelocity) {
+    return ["a"];
 };
 
 _p.serializeInitial = function(thing) {

@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var cc = require('cc');
@@ -55,7 +56,7 @@ _p.getPlanAssets = function(thingPlan) {
             if (stateKey.substring(0, 1) == '_') continue;
             var state = thingPlan.states[stateKey];
             for (var nodeKey in state) {
-                result = result.concat(this.getNodePlanAssets(state[nodeKey]))
+                result = result.concat(this.getNodePlanAssets(state[nodeKey]));
             }
         }
     }
@@ -66,7 +67,7 @@ _p.readColor = function(value) {
     if (typeof value != 'string') {
         return value;
     }
-    
+
     return {
         r: parseInt(value.substring(1,3), 16),
         g: parseInt(value.substring(3,5), 16),

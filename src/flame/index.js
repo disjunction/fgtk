@@ -21,7 +21,6 @@ module.exports = {
         Viewport: require('./view/Viewport'),
         Webpage: require('./view/Webpage'),
         Interactor: require('./view/Interactor'),
-        AssetManager: require('./view/AssetManager'),
         StateBuilder: require('./view/StateBuilder'),
         fabric: {
             FabricNodeBuilder: require('./view/fabric/FabricNodeBuilder'),
@@ -35,8 +34,10 @@ module.exports = {
     service: {
         serialize: {
             AbstractSerializer: require('./service/serialize/AbstractSerializer'),
-            ThingSerializer: require('./service/serialize/ThingSerializer')
+            ThingSerializer: require('./service/serialize/ThingSerializer'),
+            FieldSerializer: require('./service/serialize/FieldSerializer')
         },
+        AssetManager: require('./service/AssetManager'),
         CosmosManager: require('./service/CosmosManager'),
         ThingBuilder: require('./service/ThingBuilder'),
         ThingPlanHelper: require('./service/ThingPlanHelper'),

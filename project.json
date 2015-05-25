@@ -2,6 +2,8 @@
     "name": "fgtk",
     "dependencies": {
         "exec-sync": "*",
-        "jsonlint": "*"
+        "jsonlint": "*",
+        "image-size": "*",
+        "nodemon": "*",
     }
 }

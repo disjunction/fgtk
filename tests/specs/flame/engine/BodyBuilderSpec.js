@@ -3,7 +3,7 @@ var b2 = require('jsbox2d'),
     BodyBuilder = flame.engine.BodyBuilder;
 
 var makeBodyBuilder = function() {
-    var am = new flame.view.AssetManager({resources: {
+    var am = new flame.service.AssetManager({resources: {
             'some/image.png' : {
                 width: 64,
                 height: 32

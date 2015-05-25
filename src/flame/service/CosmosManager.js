@@ -1,9 +1,16 @@
+/*jslint node: true */
+"use strict";
+
 var cc = require('cc'),
     ThingPlanHelper = require('flame/service/ThingPlanHelper');
 
 /**
+ * Manages non-asset definitions, such as rover components,
+ * items, thing-plans, etc.
+ *
  * opts:
  * * resources
+ * * dirs
  * @param opts
   */
 var CosmosManager = function(opts) {

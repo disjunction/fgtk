@@ -1,41 +1,12 @@
 var cc = require('cc'),
     flame = require('flame'),
     Thing = flame.entity.Thing,
-    CosmosManager = require('flame/service/CosmosManager');
-
-
-var makeFieldEngine = function() {
-    var am = new flame.view.AssetManager({resources: {
-            'unittest/placeholder_5x2.png' : {
-                width: 160,
-                height: 64
-            }
-        }});
-    var dir = __dirname + '/../../../../cosmos',
-        cm = new flame.service.CosmosManager({
-            dirs: [
-                dir
-            ]
-        });
-    var fe = new flame.engine.FieldEngine({
-            config: {ppm: 32},
-            assetManager: am,
-            cosmosManager: cm,
-        });
-
-    fe.registerModule(new flame.engine.ModuleBox2d({
-        cosmosManager: cm,
-        assetManager: am,
-        config: {ppm: 32}
-    }), 'b');
-    fe.m.b.makeWorld();
-    return fe;
-};
+    fixtures = require('fgtk_tu/fixtures');
 
 describe("flame.service.serialize.ThingSerializer", function() {
 
     it('check: makePhisicsBundle()', function() {
-        var fe = makeFieldEngine(),
+        var fe = fixtures.makeFeBox2d(),
             plan = fe.opts.cosmosManager.get('thing/rover/hull/hull_3x2_box'),
             thing = new Thing({
                 plan: plan

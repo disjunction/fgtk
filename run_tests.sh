@@ -1,5 +1,5 @@
 #!/bin/sh
-export NODE_PATH=/usr/local/lib/node_modules:./src:./vendor
+export NODE_PATH=/usr/local/lib/node_modules:./src:./vendor:./tests
 
 if [ -z $1 ]; then
         SPECS=tests/specs
