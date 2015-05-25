@@ -53,6 +53,7 @@ _p.getResource = function(path) {
     if (!path) {
         throw new Error('bad path for getResource: ' + path);
     }
+    var originalPath = path;
     if (path.substring(path.length - 5) != '.json') {
         path += '.json';
     }
@@ -67,7 +68,7 @@ _p.getResource = function(path) {
         throw new Error('Resource not found: ' + path);
     }
     if (result.from === undefined) {
-        result.from = path;
+        result.from = originalPath;
     }
     return result;
 };

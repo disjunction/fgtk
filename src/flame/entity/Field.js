@@ -9,6 +9,11 @@ var Field = cc.Class.extend({
     },
     remove: function(thing) {
         util.removeOneFromArray(thing, this.things);
+    },
+    pushField: function(field) {
+        for (var i = 0; i < field.things.length; i++ ) {
+            this.things.push(field.things[i]);
+        }
     }
 });
 

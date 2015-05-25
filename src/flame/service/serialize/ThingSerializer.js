@@ -9,6 +9,8 @@ var AbstractSerializer = require('./AbstractSerializer');
  * - if payload is an object, then it contains bundles
  * - trailing zero values are omitted, e.g. if thing doesn't move, then "p" contains not more than 3 elements
  * ["thingId", {
+ * 	  "type": "rover" // (only in initial)
+ *
  *    // phisics object
  *    "p": [
  *         10.3434, // location x
@@ -18,17 +20,17 @@ var AbstractSerializer = require('./AbstractSerializer');
  *         5.2433, // lin. velocity y
  *         2.3435, // angular velocity
  *    ],
+ *
  *    "planSrc": "thing/obstacle/house4x4" // passed only in the initial serialization
  *
  *
  *    // interaction object
  *    "i": ["a", "l"], // in this example "accelerate" and "turn left"
- *
- *    // guts object
- *    "g": ["i": [5, 10], "a": [7, 20]], // passed as is
- *    "assembly": {"components": ... }, // custom assembly spec. passed as is, because is needed only when a new rover is added
- *    "assemblySrc": "assembly/mob/evil_guy", // predefined assembly, referenced just by src
  * ]
+ *
+ * opts:
+ * * cosmosManager (only for unserializing)
+ * * thingBuilder (only for unserializing)
  */
 
 var ThingSerializer = AbstractSerializer.extend({
@@ -62,13 +64,47 @@ _p.makeIterstateBundle = function(thing, skipVelocity) {
 };
 
 _p.serializeInitial = function(thing) {
-    return [
+    var bundle = [
         thing.id,
         {
             p: this.makePhisicsBundle(thing),
             planSrc: thing.plan.from
         }
     ];
+    if (thing.type !== undefined) {
+        bundle[1].type = thing.type;
+    }
+    return bundle;
 };
+
+_p.applyPhisicsBundle = function(thing, phisicsBundle) {
+    var l = phisicsBundle.length;
+    if (l > 0) thing.l.x = phisicsBundle[0];
+    if (l > 1) thing.l.y = phisicsBundle[1];
+    if (l > 2) thing.a = phisicsBundle[2];
+    if (l > 3) {
+        if (thing.linearVelocity === undefined) {
+            thing.linearVelocity = {x: 0.0, y: 0.0};
+        }
+        thing.linearVelocity.x = phisicsBundle[3];
+        if (l > 4) {
+            thing.linearVelocity.y = phisicsBundle[4];
+        }
+        if (l > 5) {
+            thing.angularVelocity = phisicsBundle[5];
+        }
+    }
+};
+
+_p.unserializeInitial = function(thingBundle) {
+    var plan = this.opts.cosmosManager.get(thingBundle[1].planSrc);
+    var thing = this.opts.thingBuilder.makeThing({
+        plan: plan
+    });
+    thing.id = thingBundle[0];
+    this.applyPhisicsBundle(thing, thingBundle[1].p);
+    return thing;
+};
+
 
 module.exports = ThingSerializer;

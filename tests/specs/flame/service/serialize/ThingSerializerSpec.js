@@ -23,4 +23,29 @@ describe("flame.service.serialize.ThingSerializer", function() {
 
         expect(result).toEqual([2,7,1,3,5,1.5]);
     });
+
+    it('initial serialize/unserialize', function() {
+        var fe = fixtures.makeFeBox2d(),
+            plan = fe.opts.cosmosManager.get('thing/rover/hull/hull_3x2_box'),
+            thing = new Thing({
+                plan: plan
+            });
+
+        thing.l = {x: 5, y: 7};
+        thing.a = 2;
+        fe.injectThing(thing);
+
+        var serializer =  new flame.service.serialize.ThingSerializer({
+            cosmosManager: fe.opts.cosmosManager,
+            thingBuilder: fe.opts.thingBuilder
+        });
+        var result = serializer.serializeInitial(thing);
+        expect(result[1].planSrc).toBe('thing/rover/hull/hull_3x2_box');
+        expect(result[1].p).toEqual([5,7,2]);
+
+        var newThing = serializer.unserializeInitial(result);
+        expect(newThing.l.x).toBe(5);
+        expect(newThing.l.y).toBe(7);
+        expect(newThing.a).toBe(2);
+    });
 });

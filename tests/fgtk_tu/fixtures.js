@@ -1,6 +1,10 @@
+/*jslint node: true */
+"use strict";
+
 var flame = require('flame'),
     FieldEngine = flame.engine.FieldEngine,
-    Thing = flame.entity.Thing;
+    Thing = flame.entity.Thing,
+    ThingBuilder = flame.service.ThingBuilder;
 
 module.exports = {
     makeConfig: function() {
@@ -26,12 +30,14 @@ module.exports = {
     },
 
     makeFeBox2d: function() {
-        var am = module.exports.makeAssetManager();
-            cm = module.exports.makeCosmosManager();
+        var am = module.exports.makeAssetManager(),
+            cm = module.exports.makeCosmosManager(),
+            tb = new ThingBuilder();
         var fe = new FieldEngine({
                 config: {ppm: 32},
                 assetManager: am,
                 cosmosManager: cm,
+                thingBuilder: tb
             });
 
         fe.registerModule(new flame.engine.ModuleBox2d({

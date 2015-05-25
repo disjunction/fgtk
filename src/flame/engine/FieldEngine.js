@@ -26,6 +26,7 @@ var FieldEngine = cc.Class.extend({
      * * cosmosManager
      * * assetManager
      * * uidGenerator
+     * * thingBuilder
      * @param opts object
      */
     ctor: function(opts) {
@@ -114,22 +115,6 @@ var FieldEngine = cc.Class.extend({
 
 		// remove from field
 		this.field.remove(thing);
-
-/*
-		// remove from world
-		if (thing.body) {
-			this.world.DestroyBody(body);
-			this.remove(thing.bodyId);
-		}
-
-		if (thing.group && this.groups[thing.group]) {
-			delete this.groups[thing.group][thing.ii];
-		}
-
-		if (!leaveNodes && this.nodeBuilder) {
-			this.nodeBuilder.destroyNodes(thing);
-		}
-*/
 	},
 });
 
