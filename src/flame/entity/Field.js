@@ -7,6 +7,9 @@ var Field = cc.Class.extend({
         this.opts = opts || {};
         this.things = [];
     },
+    push: function(thing) {
+        this.things.push(thing);
+    },
     remove: function(thing) {
         util.removeOneFromArray(thing, this.things);
     },

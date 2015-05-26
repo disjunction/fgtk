@@ -102,6 +102,9 @@ _p.unserializeInitial = function(thingBundle) {
         plan: plan
     });
     thing.id = thingBundle[0];
+    if (thingBundle[1].type !== undefined) {
+        thing.type = thingBundle[1].type;
+    }
     this.applyPhisicsBundle(thing, thingBundle[1].p);
     return thing;
 };
