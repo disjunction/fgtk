@@ -82,7 +82,7 @@ var ModuleCocos = ModuleAbstract.extend({
 
             for (var i = 0; i < this.fe.field.things.length; i++) {
                 thing = this.fe.field.things[i];
-                if (!thing.state || thing.plan.static) continue;
+                if (!thing.state || (thing.plan.static && !thing.plan.elevated)) continue;
                 this.syncStateFromThing(thing);
             }
 
