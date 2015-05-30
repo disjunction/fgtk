@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var cc = require('cc'),
@@ -10,12 +11,12 @@ var Thing = cc.Class.extend({
      */
     ctor: function(opts) {
         opts = opts || {};
-        
+
         if (opts.plan) this.plan = opts.plan;
-        
+
         // location
         this.l = opts.l ? opts.l : cc.p();
-        
+
         // angle
         this.a = opts.a ? opts.a : 0.0;
     }
@@ -30,12 +31,12 @@ Thing.getPrimaryNode = function(thing) {
     if (thing.state.nodes.primary) {
         return thing.state.nodes.primary;
     }
-    
+
     // ugly - getting the first node
     for (var i in thing.state.nodes) {
         return thing.state.nodes[i];
     }
-    
+
     return null;
 };
 

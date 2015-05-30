@@ -7,6 +7,8 @@ module.exports = {
         EventScheduler: require('./util/EventScheduler'),
 
         UidGenerator: require('./util/UidGenerator'),
+
+        b2p: require('./util/b2p'),
         geo: require('./util/geo'),
         util: require('./util/util')
     }

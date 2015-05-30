@@ -1,6 +1,7 @@
 var b2 = require('jsbox2d'),
     cc = require('cc'),
     smog = require('smog'),
+    Thing = require('flame/entity/Thing'),
     BodyBuilder = require('flame/engine/BodyBuilder'),
     ThingFinder = require('flame/service/ThingFinder'),
     ModuleAbstract = require('./ModuleAbstract');
@@ -22,7 +23,7 @@ var ModuleBox2d = ModuleAbstract.extend({
         ModuleAbstract.prototype.injectFe.call(this, fe, name);
 
         this.fe.fd.addListener('injectThing', function(event) {
-            var thing = event.extra.thing;
+            var thing = event.thing;
             if (!thing.plan || !thing.plan.body) return;
             this.embody(thing);
         }.bind(this));
@@ -38,7 +39,7 @@ var ModuleBox2d = ModuleAbstract.extend({
             this.world.Step(event.dt, 8, 3);
             for (var i = 0; i < this.fe.field.things.length; i++) {
                 var thing = this.fe.field.things[i];
-                if (thing.body && thing.body.IsAwake()) {
+                if (thing.body && (thing.body.IsAwake() || thing.pup)) {
                     this.syncThingFromBody(thing, event.dt);
                     this.fe.fd.dispatch(moveThingEvent);
                 }
@@ -65,8 +66,13 @@ var ModuleBox2d = ModuleAbstract.extend({
     },
 
     syncThingFromBody: function(thing, dt) {
-        thing.l = thing.body.GetPosition();
-        thing.a = thing.body.GetAngle();
+        if (thing.pup) {
+            this.fe.serializer.opts.thingSerializer.applyPhisicsBundleToBody(thing, thing.pup);
+            thing.pup = null;
+        } else {
+            thing.l = thing.body.GetPosition();
+            thing.a = thing.body.GetAngle();
+        }
         moveThingEvent.thing = thing;
         moveThingEvent.dt = dt;
     },
@@ -134,6 +140,18 @@ var ModuleBox2d = ModuleAbstract.extend({
             );
         this.rayCast(callback, muzzlePoint, endPoint);
     },
+
+    createEdges: function(){
+        var edgeThing = new Thing();
+
+        var size = this.fe.field.size,
+            points = [];
+        points.push(new b2.Vec2(size.width, size.height));
+        points.push(new b2.Vec2(0, size.height));
+        points.push(new b2.Vec2(0, 0));
+        points.push(new b2.Vec2(size.width, 0));
+        this.makeLoopEdges(points, edgeThing);
+    }
 });
 
 module.exports = ModuleBox2d;

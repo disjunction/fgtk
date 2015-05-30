@@ -12,8 +12,8 @@ var cc = require('cc'),
 var events = {
     loopCall: {type: 'loopCall', dt: 0},
     simCall: {type: 'simCall', dt: 0},
-    simStepCall: {type: 'simStepCall', dt: 0, step: 0},
-    simStepEnd: {type: 'simStepEnd', dt: 0, step: 0},
+    simStepCall: {type: 'simStepCall', dt: 0, steps: 0},
+    simStepEnd: {type: 'simStepEnd', dt: 0, steps: 0},
     simEnd: {type: 'simEnd', dt: 0},
     loopEnd: {type: 'loopEnd', dt: 0}
 };
@@ -66,15 +66,28 @@ var FieldEngine = cc.Class.extend({
     },
 
     step: function(dt) {
+        //var time = Date.now();
         var self = this;
 
         this.timeSum += dt;
 
         this.setDtAndDispatch(dt, events.loopCall);
-        this.setDtAndDispatch(dt, events.simCall);
+
 
         this.simAccumulator += dt;
         var simSteps = Math.floor(this.simAccumulator / this.simStep);
+        if (this.opts.config.fe && this.opts.config.fe.maxSimSteps) {
+            if (this.opts.config.fe.maxSimSteps < simSteps) {
+                console.log('limited ' + simSteps);
+            }
+            simSteps = Math.min(simSteps, this.opts.config.fe.maxSimSteps);
+        }
+
+        events.simCall.steps = events.simEnd.steps = simSteps;
+
+
+        this.setDtAndDispatch(dt, events.simCall);
+
         for (var i = 0; i < simSteps; i++) {
             events.simStepCall.step = i;
             this.setDtAndDispatch(this.simStep, events.simStepCall);
@@ -86,17 +99,21 @@ var FieldEngine = cc.Class.extend({
 
             this.simAccumulator -= this.simStep;
         }
-
         this.setDtAndDispatch(dt, events.simEnd);
         this.setDtAndDispatch(dt, events.loopEnd);
+        //console.log(Date.now() - time)
     },
 
     injectThing: function(thing) {
+        if (!thing) {
+            throw new Error('empty thing injected');
+        }
         if (!thing.id) {
             thing.id = this.uidGenerator.getNext();
         }
         this.field.things.push(thing);
-        this.fd.dispatch('injectThing', {
+        this.fd.dispatch({
+            type: 'injectThing',
             thing: thing
         });
     },

@@ -143,7 +143,7 @@ Array.prototype.rotate = function(first, n_first, last)
 var b2Profiler = (function()
 {
 	if (typeof(performance) === 'undefined' && typeof window != 'undefined')
-		window['performance'] = { now: function() { return +new Date(); } };
+		var performance = window['performance'] = { now: function() { return +new Date(); } };
 
 	function profileStruct(name, parent)
 	{
@@ -12780,7 +12780,7 @@ b2Joint.Create = function(def)
 	case b2Joint.e_motorJoint:
 		joint = new b2MotorJoint(def);
 		break;
-		
+
 
 	default:
 		b2Assert(false);

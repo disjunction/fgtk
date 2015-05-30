@@ -1,3 +1,6 @@
+/*jslint node: true */
+"use strict";
+
 var geo = {},
     PI = Math.PI,
     PI2 = 2 * PI,
@@ -18,12 +21,12 @@ geo.d2r = function(a) {
 };
 
 geo.sign = function(v) {
-	if (v == 0) return 0;
+	if (v === 0) return 0;
 	return v > 0? 1 : -1;
 };
 
 geo.middle = function(p1, p2) {
-    return cc.p((p2.x + p1.x) / 2, (p2.y + p1.y) / 2);
+    return {x: (p2.x + p1.x) / 2, y: (p2.y + p1.y) / 2};
 };
 
 geo.ccp2Angle = function(point) {

@@ -1,7 +1,14 @@
 /*jslint node: true */
 "use strict";
 
-var AbstractSerializer = require('./AbstractSerializer');
+var AbstractSerializer = require('./AbstractSerializer'),
+    b2 = require('jsbox2d'),
+    smog = require('fgtk/smog'),
+    b2p = smog.util.b2p;
+
+// reusable temporary Vec2
+var v1 = new b2.Vec2();
+
 
 /**
  * Serialized thing consists of serial-bundles in one object
@@ -77,12 +84,18 @@ _p.serializeInitial = function(thing) {
     return bundle;
 };
 
-_p.applyPhisicsBundle = function(thing, phisicsBundle) {
+/**
+ * Logic with delayed velocity update is too complicated
+ * Better use applyPhisicsBundleToBody unless it's initial
+ * TO CONSIDER - remove support for velocity? it's too ugly/complicated
+ */
+_p.applyPhisicsBundleToThing = function(thing, phisicsBundle) {
     var l = phisicsBundle.length;
     if (l > 0) thing.l.x = phisicsBundle[0];
     if (l > 1) thing.l.y = phisicsBundle[1];
     if (l > 2) thing.a = phisicsBundle[2];
     if (l > 3) {
+
         if (thing.linearVelocity === undefined) {
             thing.linearVelocity = {x: 0.0, y: 0.0};
         }
@@ -96,6 +109,46 @@ _p.applyPhisicsBundle = function(thing, phisicsBundle) {
     }
 };
 
+/**
+ * a bit paranoid function, but it's called very often (each pup)
+ * on all awake synamic bodies
+ * @param  {Thing} thing
+ * @param  {Array} phisicsBundle
+ */
+_p.applyPhisicsBundleToBody = function(thing, phisicsBundle) {
+    var body = thing.body,
+        x = 0.0,
+        y = 0.0,
+        a = 0.0,
+        vx = 0.0,
+        vy = 0.0,
+        va = 0.0;
+
+    // normally this should not even happen. maybe report error?
+    if (!thing.body) return;
+
+    var l = phisicsBundle.length;
+    if (l > 0) {
+        x = phisicsBundle[0];
+        if (l > 1) y = phisicsBundle[1];
+        if (l > 2) a = phisicsBundle[2];
+        b2p.assignVec2(v1, x, y);
+        body.SetTransform(v1, a);
+        thing.l.x = x;
+        thing.l.y = y;
+        thing.a = a;
+
+        if (l > 3) {
+            vx = phisicsBundle[3];
+            if (l > 4) vy = phisicsBundle[4];
+            if (l > 5) va = phisicsBundle[5];
+            b2p.assignLinearVelocity(body, vx, vy);
+            body.SetAngularVelocity(va);
+        }
+    }
+};
+
+
 _p.unserializeInitial = function(thingBundle) {
     var plan = this.opts.cosmosManager.get(thingBundle[1].planSrc);
     var thing = this.opts.thingBuilder.makeThing({
@@ -105,7 +158,7 @@ _p.unserializeInitial = function(thingBundle) {
     if (thingBundle[1].type !== undefined) {
         thing.type = thingBundle[1].type;
     }
-    this.applyPhisicsBundle(thing, thingBundle[1].p);
+    this.applyPhisicsBundleToThing(thing, thingBundle[1].p);
     return thing;
 };
 

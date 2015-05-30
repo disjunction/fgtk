@@ -64,7 +64,7 @@ var ModuleCocos = ModuleAbstract.extend({
         ModuleAbstract.prototype.injectFe.call(this, fe, name);
 
         this.fe.fd.addListener('injectThing', function(event) {
-            thing = event.extra.thing;
+            thing = event.thing;
             if (!thing.plan) return;
             this.envision(thing);
         }.bind(this));
@@ -101,7 +101,7 @@ var ModuleCocos = ModuleAbstract.extend({
         if (node.plan.ani &&
             node.plan.ani[0] == 'sequence' &&
             node.plan.ani[1][node.plan.ani[1].length -1][0] == 'removeThingNode'
-        ) {                
+        ) {
             node.backlink = {
                 thing: thing
             };
