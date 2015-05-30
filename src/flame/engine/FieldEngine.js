@@ -39,16 +39,25 @@ var FieldEngine = cc.Class.extend({
         this.m = {};
 
         /**
-         * sum of all dt since start of the engine
+         * varios debug statistics
          */
-        this.timeSum = 0;
+        this.stats = {};
 
         this.fd = new EventDispatcher();
         this.scheduler = new EventScheduler(this.fd, new SchedulingQueue());
         this.field = new Field();
 
+        /**
+         * sum of all dt since start of the engine
+         */
+        this.timeSum = 0;
+
         this.simAccumulator = 0;
         this.simStep = 0.02;
+
+        /**
+         * this should correspond to timeSum, unless simSteps where dropped
+         */
         this.simSum = 0;
 
         // here "m" stands for "master"
@@ -98,6 +107,7 @@ var FieldEngine = cc.Class.extend({
             this.setDtAndDispatch(this.simStep, events.simStepEnd);
 
             this.simAccumulator -= this.simStep;
+            this.simSum += this.simStep;
         }
         this.setDtAndDispatch(dt, events.simEnd);
         this.setDtAndDispatch(dt, events.loopEnd);
