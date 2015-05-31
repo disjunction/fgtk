@@ -102,4 +102,32 @@ _p.getAllAssets = function() {
     );
 };
 
+_p.getPathsInDirectory = function(path, recursive) {
+    var result = [],
+        jsonMatch = new RegExp('\.json$'),
+        matcher;
+
+
+    if (recursive) {
+        matcher = new RegExp('^' + path + '/');
+    } else {
+        matcher = new RegExp('^' + path + '/[^/]+$');
+    }
+    for (var i in this.opts.resources) {
+        if (i.match(matcher)) {
+            result.push(i.replace(jsonMatch, ''));
+        }
+    }
+    return result;
+};
+
+_p.getAllInDirectory = function(path, recursive) {
+    var paths = this.getPathsInDirectory(path, recursive),
+        result = {};
+    for (var i = 0; i < paths.length; i++) {
+        result[paths[i]] = this.getResource(paths[i]);
+    }
+    return result;
+};
+
 module.exports = CosmosManager;

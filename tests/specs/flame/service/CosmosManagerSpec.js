@@ -20,4 +20,20 @@ describe("flame.service.CosmosManager", function() {
         expect(assets).toContain('vorschlag/bg/tileset2.png');
     });
 
+    it('check: getPathsInDirectory() and getAllInDirectory()', function() {
+        var result;
+
+        result = cm.getPathsInDirectory('thing');
+        expect(result).not.toContain('thing/bg/vicinity1');
+
+        result = cm.getPathsInDirectory('thing/bg');
+        expect(result).toContain('thing/bg/vicinity1');
+
+        result = cm.getPathsInDirectory('thing', true);
+        expect(result).toContain('thing/bg/vicinity1');
+
+        result = cm.getAllInDirectory('thing', true);
+        expect(result['thing/bg/vicinity1']).toBeDefined();
+        expect(result['thing/bg/vicinity1'].states.basic.bg).toBeDefined();
+    });
 });
