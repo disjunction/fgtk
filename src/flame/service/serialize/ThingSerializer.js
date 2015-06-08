@@ -15,10 +15,10 @@ var v1 = new b2.Vec2();
  * - bundle is transferred as tuple [thingId, payload] - all numbers are rounded to 4th sign
  * - if payload is an object, then it contains bundles
  * - trailing zero values are omitted, e.g. if thing doesn't move, then "p" contains not more than 3 elements
- * ["thingId", {
+ * ["thingId", "inject", {
  * 	  "type": "rover" // (only in initial)
  *
- *    // phisics object
+ *    // phisics bundle
  *    "p": [
  *         10.3434, // location x
  *         20.4543, // location y
@@ -62,8 +62,8 @@ _p.makePhisicsBundle = function(thing, skipVelocity) {
             this.outFloat(linearVelocity.y),
             this.outFloat(angularVelocity)
         );
+        return this.cutTrailingZeros(result);
     }
-    return this.cutTrailingZeros(result);
 };
 
 _p.makeIterstateBundle = function(thing, skipVelocity) {
@@ -73,13 +73,14 @@ _p.makeIterstateBundle = function(thing, skipVelocity) {
 _p.serializeInitial = function(thing) {
     var bundle = [
         thing.id,
+        "add",
         {
             p: this.makePhisicsBundle(thing),
             planSrc: thing.plan.from
         }
     ];
     if (thing.type !== undefined) {
-        bundle[1].type = thing.type;
+        bundle[2].type = thing.type;
     }
     return bundle;
 };
@@ -150,15 +151,15 @@ _p.applyPhisicsBundleToBody = function(thing, phisicsBundle) {
 
 
 _p.unserializeInitial = function(thingBundle) {
-    var plan = this.opts.cosmosManager.get(thingBundle[1].planSrc);
+    var plan = this.opts.cosmosManager.get(thingBundle[2].planSrc);
     var thing = this.opts.thingBuilder.makeThing({
         plan: plan
     });
     thing.id = thingBundle[0];
-    if (thingBundle[1].type !== undefined) {
-        thing.type = thingBundle[1].type;
+    if (thingBundle[2].type !== undefined) {
+        thing.type = thingBundle[2].type;
     }
-    this.applyPhisicsBundleToThing(thing, thingBundle[1].p);
+    this.applyPhisicsBundleToThing(thing, thingBundle[2].p);
     return thing;
 };
 

@@ -8,7 +8,7 @@ var AbstractSerializer = require('./AbstractSerializer');
 /**
  * Serializes the field for initial feed, when a new player joins
  * Format:
- * {things: [["thingId1", {bundles...}], ["thingId2", {bundles...}] ...]}
+ * {things: [["thingId1", "inject", {bundles...}], ["thingId2", "inject", {bundles...}] ...]}
  *
  * opts:
  * * thingSerializer
