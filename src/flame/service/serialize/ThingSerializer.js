@@ -73,7 +73,7 @@ _p.makeIterstateBundle = function(thing, skipVelocity) {
 _p.serializeInitial = function(thing) {
     var bundle = [
         thing.id,
-        "add",
+        "inject",
         {
             p: this.makePhisicsBundle(thing),
             planSrc: thing.plan.from

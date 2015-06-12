@@ -1,5 +1,8 @@
 module.exports = {
     EMPTY: {},
+    entity: {
+        Sibling: require('./entity/Sibling')
+    },
     app: require('./app'),
     util: {
         EventDispatcher: require('./util/EventDispatcher'),
