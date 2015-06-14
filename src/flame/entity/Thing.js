@@ -12,7 +12,12 @@ var Thing = cc.Class.extend({
     ctor: function(opts) {
         opts = opts || {};
 
-        if (opts.plan) this.plan = opts.plan;
+        if (opts.plan) {
+            this.plan = opts.plan;
+            if (opts.plan.type) {
+                this.type = opts.plan.type;
+            }
+        }
 
         // location
         this.l = opts.l ? opts.l : cc.p();

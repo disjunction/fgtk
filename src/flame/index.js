@@ -6,10 +6,12 @@ module.exports = {
         },
         FieldEngine: require('./engine/FieldEngine'),
         BodyBuilder: require('./engine/BodyBuilder'),
+        ModuleAbstract: require('./engine/ModuleAbstract'),
         ModuleCocos: require('./engine/ModuleCocos'),
         ModuleBox2d: require('./engine/ModuleBox2d')
     },
     entity: {
+        Avatar: require('./entity/Avatar'),
         Thing: require('./entity/Thing'),
         Field: require('./entity/Field')
     },

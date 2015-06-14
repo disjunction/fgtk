@@ -47,6 +47,8 @@ var FieldEngine = cc.Class.extend({
         this.scheduler = new EventScheduler(this.fd, new SchedulingQueue());
         this.field = new Field();
 
+        this.siblingMap = {};
+
         /**
          * sum of all dt since start of the engine
          */
@@ -125,6 +127,14 @@ var FieldEngine = cc.Class.extend({
         this.fd.dispatch({
             type: 'injectThing',
             thing: thing
+        });
+    },
+
+    injectSibling: function(sibling) {
+        this.siblingMap[sibling.siblingId] = sibling;
+        this.fd.dispatch({
+            type: 'injectSibling',
+            sibling: sibling
         });
     },
 

@@ -29,10 +29,6 @@ var v1 = new b2.Vec2();
  *    ],
  *
  *    "planSrc": "thing/obstacle/house4x4" // passed only in the initial serialization
- *
- *
- *    // interaction object
- *    "i": ["a", "l"], // in this example "accelerate" and "turn left"
  * ]
  *
  * opts:
@@ -50,19 +46,21 @@ var _p = ThingSerializer.prototype;
 
 _p.makePhisicsBundle = function(thing, skipVelocity) {
     var result = [
-        this.outFloat(thing.l.x),
-        this.outFloat(thing.l.y),
-        this.outFloat(thing.a)
+        this.outCoord(thing.l.x),
+        this.outCoord(thing.l.y),
+        this.outAngle(thing.a)
     ];
     if (thing.body && !skipVelocity) {
         var linearVelocity = thing.body.GetLinearVelocity();
         var angularVelocity = thing.body.GetAngularVelocity();
         result.push(
-            this.outFloat(linearVelocity.x),
-            this.outFloat(linearVelocity.y),
-            this.outFloat(angularVelocity)
+            this.outVelocity(linearVelocity.x),
+            this.outVelocity(linearVelocity.y),
+            this.outVelocity(angularVelocity)
         );
         return this.cutTrailingZeros(result);
+    } else {
+        return result;
     }
 };
 
@@ -112,7 +110,7 @@ _p.applyPhisicsBundleToThing = function(thing, phisicsBundle) {
 
 /**
  * a bit paranoid function, but it's called very often (each pup)
- * on all awake synamic bodies
+ * on all awake dynamic bodies
  * @param  {Thing} thing
  * @param  {Array} phisicsBundle
  */
@@ -140,6 +138,7 @@ _p.applyPhisicsBundleToBody = function(thing, phisicsBundle) {
         thing.a = a;
 
         if (l > 3) {
+            body.SetAwake(true);
             vx = phisicsBundle[3];
             if (l > 4) vy = phisicsBundle[4];
             if (l > 5) va = phisicsBundle[5];

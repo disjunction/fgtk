@@ -35,8 +35,8 @@ _p.makeThingByPlan = function(plan) {
 _p.makeThing = function(opts) {
     var plan = opts.plan,
         className = plan.class || 'Thing',
-        classCtor = this.getClass(className),
-        thing = new classCtor(opts);
+        ClassCtor = this.getClass(className),
+        thing = new ClassCtor(opts);
 
     return thing;
 };

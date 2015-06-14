@@ -20,6 +20,18 @@ _p.outFloat = function(value) {
     return Math.round(value * 10000) / 10000;
 };
 
+_p.outCoord = function(value) {
+    return Math.round(value * 100) / 100;
+};
+
+_p.outVelocity = function(value) {
+    return Math.round(value * 100) / 100;
+};
+
+_p.outAngle = function(value) {
+    return Math.round(value * 100) / 100;
+};
+
 _p.cutTrailingZeros = function(value) {
     while (value && value[value.length - 1] === 0) {
         value.pop();

@@ -1,3 +1,7 @@
+/**
+ * fgtk Testing Utilities
+ */
+
 /*jslint node: true */
 "use strict";
 

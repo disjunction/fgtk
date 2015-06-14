@@ -1,6 +1,6 @@
 var Thing = require('flame').entity.Thing;
-    
-describe("Thing", function() {
+
+describe("flame.entity.Thing", function() {
    it('can be created', function() {
       var t = new Thing();
    });

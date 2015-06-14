@@ -1,16 +1,17 @@
 /*jslint node: true */
 "use strict";
 
-var dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+var dictionary = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+    dictLength = dictionary.length;
 
 /**
  * recursive, packs int to base64 form
- * @param {type} int
- * @returns {packInt@pro;dictionary@call;substring}
+ * @param {int} int
+ * @returns {string}
  */
 function packInt(int) {
     var remainder = int % dictionary.length,
-        letter = dictionary.substring(remainder, remainder + 1);
+        letter = dictionary.charAt(remainder);
     if (remainder != int) {
         return packInt(Math.floor(int / dictionary.length)) + letter;
     } else {

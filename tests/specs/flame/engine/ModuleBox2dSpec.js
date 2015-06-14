@@ -31,7 +31,7 @@ var makeFieldEngine = function() {
     return fe;
 };
 
-describe('ModuleBox2d', function() {
+describe('flame.engine.ModuleBox2d', function() {
     it('supports: embody()', function() {
         var fe = makeFieldEngine();
 

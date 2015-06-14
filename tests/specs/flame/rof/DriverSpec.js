@@ -26,7 +26,7 @@ var makeBody = function() {
 };
 
 
-describe('Driver', function() {
+describe('flame.rof.Driver', function() {
     it('makes a mover and drives', function(){
         var thing = new flame.entity.Thing();
         thing.body = makeBody();
@@ -39,10 +39,10 @@ describe('Driver', function() {
             engineX: -2
         });
         expect(typeof thing.mover).toBe('object');
-        
+
         thing.i = {
             a: 1
         }
         d.drive(thing);
-   });  
+   });
 });

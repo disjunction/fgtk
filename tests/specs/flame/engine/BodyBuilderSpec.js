@@ -21,12 +21,12 @@ var makeBodyBuilder = function() {
         });
     return builder;
 };
-    
-describe("BodyBuilder", function() {
+
+describe("flame.engine.BodyBuilder", function() {
     it('can be created', function() {
         expect(typeof makeBodyBuilder()).toBe('object');
     });
-   
+
     it('brick is created', function() {
         var bb = makeBodyBuilder();
         var brick = bb.makeBody({
@@ -42,7 +42,7 @@ describe("BodyBuilder", function() {
         });
         expect(typeof brick).toBe('object');
     });
-    
+
     it('box is created', function() {
         var bb = makeBodyBuilder();
         var brick = bb.makeBody({

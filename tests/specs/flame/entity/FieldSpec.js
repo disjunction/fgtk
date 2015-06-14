@@ -2,7 +2,7 @@ var flame = require('flame'),
     Field = flame.entity.Field,
     Thing = flame.entity.Thing;
 
-describe("Field", function() {
+describe("flame.entity.Field", function() {
     it('can be created', function() {
         var o = new Field();
     });

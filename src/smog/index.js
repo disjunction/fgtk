@@ -1,6 +1,7 @@
 module.exports = {
     EMPTY: {},
     entity: {
+        Player: require('./entity/Player'),
         Sibling: require('./entity/Sibling')
     },
     app: require('./app'),

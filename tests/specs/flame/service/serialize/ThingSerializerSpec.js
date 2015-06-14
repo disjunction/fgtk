@@ -40,8 +40,9 @@ describe("flame.service.serialize.ThingSerializer", function() {
             thingBuilder: fe.opts.thingBuilder
         });
         var result = serializer.serializeInitial(thing);
-        expect(result[1].planSrc).toBe('thing/rover/hull/hull_3x2_box');
-        expect(result[1].p).toEqual([5,7,2]);
+
+        expect(result[2].planSrc).toBe('thing/rover/hull/hull_3x2_box');
+        expect(result[2].p).toEqual([5,7,2]);
 
         var newThing = serializer.unserializeInitial(result);
         expect(newThing.l.x).toBe(5);

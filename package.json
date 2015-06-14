@@ -1,10 +1,10 @@
 {
     "name": "fgtk",
     "dependencies": {
-        "exec-sync": "*",
+        "ffi": "*",
         "jsonlint": "*",
         "image-size": "*",
-        "nodemon": "*",
-        "socket.io": "*"
+
+        "jasmine-node": "*"
     }
 }

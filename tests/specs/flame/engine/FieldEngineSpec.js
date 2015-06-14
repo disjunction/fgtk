@@ -3,7 +3,7 @@ var flame = require('flame'),
     Thing = flame.entity.Thing,
     fixtures = require('fgtk_tu/fixtures');
 
-describe("FieldEngine", function() {
+describe("flame.engine.FieldEngine", function() {
     it('can be created', function() {
         var fe = new FieldEngine({});
         expect(typeof fe).toBe('object');
