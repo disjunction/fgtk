@@ -59,6 +59,14 @@ _p.makeState = function(thingPlan, stateName, parentState) {
                 delete node.plan.ani;
                 delete node.plan.compiledAni;
             }
+
+            // the original plan properties are overwritten by the new plan ones
+            for (var j in newNodePlan) {
+                if (j != 'inherit' && j != 'ani') {
+                    node.plan[j] = newNodePlan[j];
+                }
+            }
+
             node.inherited = true;
         } else {
             node = this.opts.nb.makeNode(newNodePlan);
