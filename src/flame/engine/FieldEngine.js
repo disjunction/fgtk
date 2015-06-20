@@ -34,7 +34,7 @@ var FieldEngine = cc.Class.extend({
         this.opts = opts || {};
 
         /**
-         * space for mixins
+         * space for modules
          */
         this.m = {};
 
@@ -48,6 +48,7 @@ var FieldEngine = cc.Class.extend({
         this.field = new Field();
 
         this.siblingMap = {};
+        this.thingMap = {};
 
         /**
          * sum of all dt since start of the engine
@@ -124,9 +125,17 @@ var FieldEngine = cc.Class.extend({
             thing.id = this.uidGenerator.getNext();
         }
         this.field.things.push(thing);
+        this.thingMap[thing.id] = thing;
         this.fd.dispatch({
             type: 'injectThing',
             thing: thing
+        });
+    },
+
+    injectAvatar: function(avatar) {
+        this.fd.dispatch({
+            type: 'injectAvatar',
+            avatar: avatar
         });
     },
 
@@ -152,6 +161,7 @@ var FieldEngine = cc.Class.extend({
 
 		// remove from field
 		this.field.remove(thing);
+        delete this.thingMap[thing.id];
 	},
 });
 

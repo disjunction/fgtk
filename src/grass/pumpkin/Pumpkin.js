@@ -1,10 +1,12 @@
 /*jslint node: true */
 "use strict";
 
-var LocalPumpkinClient = require('./client/LocalPumpkinClient');
+var LocalPumpkinClient = require('./client/LocalPumpkinClient'),
+    PumpkinSerializer = require('./service/PumpkinSerializer');
 
 function Pumpkin(opts) {
     this.opts = opts;
+    this.serializer = new PumpkinSerializer();
 }
 
 var _p = Pumpkin.prototype;

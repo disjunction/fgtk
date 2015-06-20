@@ -64,9 +64,25 @@ _p.makePhisicsBundle = function(thing, skipVelocity) {
     }
 };
 
-_p.makeIterstateBundle = function(thing, skipVelocity) {
-    return ["a"];
+_p.makeIterstateBundle = function(thing) {
+    var bundle = [];
+    for (var key in thing.i) {
+        bundle.push(key);
+    }
+    return bundle;
 };
+
+_p.applyInterstateBundle = function(thing, interstateBundle) {
+    for (var key in thing.i) {
+        if (interstateBundle.indexOf(key) == -1) {
+            delete thing.i[key];
+        }
+    }
+    for (var j = 0; j < interstateBundle.length; j++) {
+        thing.i[interstateBundle[j]] = 1;
+    }
+};
+
 
 _p.serializeInitial = function(thing) {
     var bundle = [

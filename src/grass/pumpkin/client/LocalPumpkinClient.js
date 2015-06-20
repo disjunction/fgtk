@@ -5,7 +5,7 @@ var smog = require('fgtk/smog');
 
 function LocalPumpkinClient(opts) {
     this.opts = opts;
-    this.anonymousUidGenerator = new smog.util.UidGenerator('anon_');
+    this.anonymousUidGenerator = new smog.util.UidGenerator('s_anon');
 }
 var _p = LocalPumpkinClient.prototype;
 
