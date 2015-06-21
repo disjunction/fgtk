@@ -6,9 +6,8 @@ var cc = require('cc'),
  * opts.applier - see ProtagonistApplier below
  * opts.layout = {
  *     states: {
- *     		// up
- *          38: ["up"],
- *          32: ["shoot"]
+ *          38: "up",
+ *          32: ["shoot", "down"]
  *     },
  *
  * 	   events: {
@@ -50,6 +49,14 @@ var Interstate = cc.Class.extend({
             this.map[key] = false;
             this.changed = true;
         }
+    },
+    setArray: function(array) {
+        this.array = array;
+        var map = {};
+        for (var i = 0; i < array.length; i++) {
+            map[array[i]] = true;
+        }
+        this.map = map;
     },
     get: function(key) {
         return this.map[key];

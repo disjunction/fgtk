@@ -29,6 +29,7 @@ var makeBody = function() {
 describe('flame.rof.Driver', function() {
     it('makes a mover and drives', function(){
         var thing = new flame.entity.Thing();
+
         thing.body = makeBody();
         var d = new Driver({
             world: world
@@ -38,11 +39,9 @@ describe('flame.rof.Driver', function() {
             accelFront: 50,
             engineX: -2
         });
+        thing.i = new flame.view.Interactor.Interstate();
+        thing.i.set('a', true);
         expect(typeof thing.mover).toBe('object');
-
-        thing.i = {
-            a: 1
-        }
         d.drive(thing);
    });
 });
