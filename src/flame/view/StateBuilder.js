@@ -63,7 +63,7 @@ _p.makeState = function(thingPlan, stateName, parentState) {
             // the original plan properties are overwritten by the new plan ones
             for (var j in newNodePlan) {
                 if (j != 'inherit' && j != 'ani') {
-                    node.plan[j] = newNodePlan[j];
+                    //node.plan[j] = newNodePlan[j];
                 }
             }
 

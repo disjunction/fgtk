@@ -1,3 +1,6 @@
+/*jslint node: true */
+"use strict";
+
 var cc = require('cc'),
     b2 = require('jsbox2d'),
     core = require('flame/rof/core'),
@@ -25,21 +28,26 @@ var TrackChasis = AbstractChasis.extend({
 
         if (!mover.i) return;
 
-        if (mover.i[core.TURN_LEFT] && config.wheelTorque) {
+        if (!mover.i.get) {
+            console.log(mover);
+            throw new Error('mover has interactor, without get() method');
+        }
+
+        if (mover.i.get(core.TURN_LEFT) && config.wheelTorque) {
             if (!isFinite(config.wheelTorque)) {
                 throw new Error('wheelTorque is not finite');
             }
             body.ApplyTorque(config.wheelTorque, true);
         }
 
-        if (mover.i[core.TURN_RIGHT] && config.wheelTorque) {
+        if (mover.i.get(core.TURN_RIGHT) && config.wheelTorque) {
             if (!isFinite(config.wheelTorque)) {
                 throw new Error('wheelTorque is not finite');
             }
             body.ApplyTorque(-config.wheelTorque, true);
         }
 
-        if (mover.i[core.ACCELERATE]) {
+        if (mover.i.get(core.ACCELERATE)) {
             strength = config.accelForward;
             if (!isFinite(strength)) {
                 throw new Error('accelForward is not finite');
@@ -48,7 +56,7 @@ var TrackChasis = AbstractChasis.extend({
             enginePoint = body.GetWorldCenter();
             force = v1.Set(strength * Math.cos(angle), strength * Math.sin(angle));
             body.ApplyForce(force, enginePoint, true);
-        } else if (mover.i[core.DECELERATE]) {
+        } else if (mover.i.get(core.DECELERATE)) {
             strength = config.accelBackward;
             if (!isFinite(strength)) {
                 throw new Error('accelBackward is not finite');

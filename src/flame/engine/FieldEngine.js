@@ -27,6 +27,7 @@ var FieldEngine = cc.Class.extend({
      * * assetManager
      * * uidGenerator
      * * thingBuilder
+     * * interactor
      * @param opts object
      */
     ctor: function(opts) {

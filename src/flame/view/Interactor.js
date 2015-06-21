@@ -1,49 +1,164 @@
-var cc = require('cc');
+var cc = require('cc'),
+    smog = require('fgtk/smog');
 
 /**
  * opts.layer - cocs2d.nodes.Layer to bind to
  * opts.applier - see ProtagonistApplier below
  * opts.layout = {
- *     keys: {
+ *     states: {
  *     		// up
- *          38: {
- *          	type: 'state',
- *              state: 'up'
- *          },
+ *          38: ["up"],
+ *          32: ["shoot"]
+ *     },
  *
- *          // space
- *          32: {
- *          	type: 'event',
- *          	on: 'keyUp',
- *              event: 'shoot'
- *          }
- *     }
+ * 	   events: {
+ * 	   		38: {
+ * 	   			"keyUp": ["shoot", "up"]
+ * 	   		 	"keyDown": ["someEvent"]
+ * 	   		}
+ * 	   }
  * }
  */
 
+var Interstate = cc.Class.extend({
+    ctor: function(){
+        this.array = [];
+        this.map = {};
+        this.enabled = true;
+        this.changed = true;
+    },
+
+    /**
+     * sets/unsets state
+     * @param  {string|Array.<string>} key
+     * @param  {boolean} value
+     */
+    set: function(key, value) {
+        if (Array.isArray(key)) {
+            for (var i = 0; i < key.length; i++) {
+                this.set(key[i], value);
+            }
+            return;
+        }
+
+        if (value && !this.map[key]) {
+            this.array.push(key);
+            this.map[key] = true;
+            this.changed = true;
+        } else if (!value && this.map[key]) {
+            this.array.splice(this.array.indexOf(key), 1);
+            this.map[key] = false;
+            this.changed = true;
+        }
+    },
+    get: function(key) {
+        return this.map[key];
+    },
+    serialize: function() {
+        var serial = [];
+        for (var i in this.map) {
+            if (this.map[i]) {
+                serial.push(i);
+            }
+        }
+        return serial;
+    },
+    applySerial: function(array) {
+        var map = {};
+        if (array) for (var i = 0; i < array.length; i++) {
+            map[array[i]] = true;
+        }
+        this.map = map;
+    }
+});
 
 var Interactor = cc.Class.extend({
     /**
      * @param opts object
      */
     ctor: function(opts) {
-        this.opts = opts;
-
-	this.state = new Interactor.State();
-	if (opts.applier) {
-		this.applier = opts.applier;
-	}
-	this.layout = (opts.layout)? opts.layout : {keys: {}};
-
-	if (opts.layer) {
-		this.bindToLayer(opts.layer);
-	}
+        opts = opts || {layout: {states: {}, events: {}}};
+    	this.i = new Interactor.Interstate();
+    	this.layout = opts.layout;
+        this.dispatcher = new smog.util.EventDispatcher();
     },
 
-    /**
-     * works only for cocos2d
-     * @param object jqueryObject
-     */
+    fireEvent: function(eventName, nestedEvent) {
+        if (Array.isArray(eventName)) {
+            for (var i = 0; i < eventName.length; i++) {
+                this.fireEvent(eventName[i]);
+            }
+            return;
+        }
+
+        this.dispatcher.dispatch({
+            type: eventName,
+            event: nestedEvent
+        });
+    },
+
+    processEvent: function(name, event) {
+        var code = event.keyCode;
+
+        // if it's not keyboard but a mouse
+        // the _right_ way is to use getButton(), but who cares...
+        if (event._button !== undefined) {
+            code = (event._button == 2)? Interactor.RMB : Interactor.LMB;
+        }
+
+        if (event._scrollY !== undefined && event._scrollY !== 0 ) {
+            code = Interactor.SCROLL;
+            name = (event._scrollY > 0)? 'scrollUp' : 'scrollDown';
+        }
+
+        if (this.layout.states[code]) {
+            switch (name) {
+                case "keyDown":
+                    this.i.set(this.layout.states[code], true);
+                    break;
+                case "keyUp":
+                    this.i.set(this.layout.states[code], false);
+                    break;
+            }
+            if (this.i.changed) {
+                this.dispatcher.dispatch({
+                    type: "interstateChanged",
+                    i: this.i
+                });
+                this.i.changed = false;
+            }
+        }
+
+        if (this.layout.events[code] && this.layout.events[code][name]) {
+            this.fireEvent(this.layout.events[code][name], event);
+        }
+    },
+
+    bindToCocos: function(layer) {
+        var keyEvt = {keyCode: 0};
+        cc.eventManager.addListener({
+            event: cc.EventListener.KEYBOARD,
+            onKeyPressed:function(key, event) {
+                keyEvt.keyCode = key;
+            	this.processEvent("keyDown", keyEvt);
+            }.bind(this),
+            onKeyReleased:function(key, event) {
+            	keyEvt.keyCode = key;
+            	this.processEvent("keyUp", keyEvt);
+            }.bind(this)
+        }, layer);
+    },
+
+    bindToJquery: function(object) {
+        object.keydown(function(event) {
+            this.processEvent('keyDown', event);
+        }.bind(this));
+
+        object.keyup(function(event) {
+            this.processEvent('keyUp', event);
+        }.bind(this));
+    },
+
     bindMouseToCustomCursor: function(jqueryObject, layer) {
         jqueryObject.css({
             cursor: 'none'
@@ -52,107 +167,25 @@ var Interactor = cc.Class.extend({
         cc.eventManager.addListener({
             event: cc.EventListener.MOUSE,
             onMouseMove: function(event){
-                if (this.applier) this.applier.applyEvent(event, 'mouseMove');
+                this.dispatcher.dispatch({
+                    type: 'mouseMove',
+                    event: event
+                });
             }.bind(this),
             onMouseUp: function(event){
-                this.mouseUp(event);
+                this.processEvent("keyUp", event);
             }.bind(this),
             onMouseDown: function(event){
-                this.mouseDown(event);
+                this.processEvent("keyDown", event);
             }.bind(this),
             onMouseScroll: function(event){
-                this.processEvent(event, 'event', true);
+                this.processEvent("mouseScroll", event);
             }.bind(this)
         }, layer);
-    },
-
-    // ignore cocos2d, but bind to jquery events directly
-    bindToJquery: function(object) {
-        object.keyup(this.keyUp.bind(this));
-        object.keydown(this.keyDown.bind(this));
-    },
-
-    bindToCocos: function(layer) {
-        var me = this,
-            keyEvt = {keyCode: 0};
-        cc.eventManager.addListener({
-            event: cc.EventListener.KEYBOARD,
-            onKeyPressed:function(key, event) {
-                keyEvt.keyCode = key;
-            	me.keyDown(keyEvt);
-            }.bind(this),
-            onKeyReleased:function(key, event) {
-            	keyEvt.keyCode = key;
-            	me.keyUp(keyEvt);
-            }.bind(this)
-        }, layer);
-    },
-    processKey: function(evt, type, on, key) {
-        if (!this.state.enabled) return;
-        switch (key.type) {
-            case 'state':
-                var stateCode = key.state;
-                on? this.state.on(stateCode) : this.state.off(stateCode);
-                break;
-            case 'event':
-                if (type == key.on) {
-                    if (this.applier) this.applier.applyEvent(evt, key.event);
-                }
-                break;
-            default:
-                    throw new Error('unknown layout entry type for key ' + evt.keyCode);
-        }
-    },
-    processEvent: function(evt, type, on) {
-        var code = evt.keyCode;
-
-        // if it's not keyboard but a mouse
-        // the _right_ way is to use getButton(), but who cares...
-        if (typeof evt._button != 'undefined') {
-            code = (evt._button == 2)? Interactor.RMB : Interactor.LMB;
-        }
-
-        if (typeof evt._scrollY != 'undefined' && evt._scrollY != 0 ) {
-            code = Interactor.SCROLL;
-            type = (evt._scrollY > 0)? 'up' : 'down';
-        }
-
-        if (this.layout.keys[code]) {
-            // if key contains an array, then try to execute all of them
-            if (Array.isArray(this.layout.keys[code])) {
-                for (var i in this.layout.keys[code]) {
-                    this.processKey(evt, type, on, this.layout.keys[code][i]);
-                }
-            // else there is only single operation
-            } else {
-                this.processKey(evt, type, on, this.layout.keys[code]);
-            }
-        }
-        this.afterInteract(evt);
-    },
-
-    keyDown: function(evt) {
-        this.processEvent(evt, 'keyDown', true);
-    },
-
-    keyUp: function(evt) {
-        this.processEvent(evt, 'keyUp', false);
-    },
-    mouseDown: function(evt) {
-        this.processEvent(evt, 'keyDown', true);
-    },
-    mouseUp: function(evt) {
-        this.processEvent(evt, 'keyUp', false);
-    },
-
-    afterInteract: function(evt) {
-            if (this.state.changed && this.applier) {
-                    this.applier.applyState(this.state);
-            }
-            this.state.changed = 0;
     }
-
 });
+
+Interactor.Interstate = Interstate;
 
 var keyMap = {
 	ARROW_LEFT: 37,
@@ -213,74 +246,10 @@ var keyMap = {
 	LMB: 1001,
 	RMB: 1002,
 
-        SCROLL: 1010
+    SCROLL: 1010
 };
 for (var i in keyMap) {
 	Interactor[i] = keyMap[i];
 }
-
-//// PROTAGONIST APPLIER
-
-Interactor.ProtagonistApplier = function(opts) {
-	this.p = opts.protagonist;
-};
-
-Interactor.ProtagonistApplier.prototype.applyState = function(state) {
-	this.p.ego.interState = state;
-};
-
-Interactor.ProtagonistApplier.prototype.applyEvent = function(evt, defEvent) {
-	console.log('untracked event: ' + defEvent);
-};
-
-
-Interactor.State = cc.Class.extend({
-    /**
-     * @param opts object
-     */
-    ctor: function() {
-        this._c = 1;
-
-        // this is used to disable any keypress processing
-        this._enabled = true;
-    },
-    on: function(key) {
-            if (!this[key]) this.changed = 1;
-            this[key] = 1;
-    },
-    off: function(key) {
-            if (this[key]) this.changed = 1;
-            delete this[key];
-    },
-});
-
-var _p = Interactor.State.prototype;
-
-cc.defineGetterSetter(_p, 'enabled',
-    function() {
-        return this._enabled;
-    },
-    function(v) {
-        if (!v && this._enabled) {
-            // disabled whatever was on
-            for (var key in this) {
-                if (key.substr(0, 1) == '_') continue;
-                if (typeof this[key] != 'function') {
-                    this.off(key);
-                }
-            }
-        }
-        this._enabled = v;
-    }
-);
-
-cc.defineGetterSetter(_p, 'changed',
-    function() {
-        return this._c;
-    },
-    function(v) {
-        this._c = v;
-    }
-);
 
 module.exports = Interactor;
