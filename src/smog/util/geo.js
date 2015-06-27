@@ -37,6 +37,10 @@ geo.segment2Angle = function(p1, p2) {
     return Math.atan2(p2.y - p1.y, p2.x - p1.x);
 };
 
+geo.vector = function(length, a) {
+    return {x: length * Math.cos(a), y: length * Math.sin(a)};
+};
+
 
 /**
  * converts any angle to [-pi; pi]

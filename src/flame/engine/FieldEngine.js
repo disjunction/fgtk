@@ -79,7 +79,6 @@ var FieldEngine = cc.Class.extend({
     },
 
     step: function(dt) {
-        //var time = Date.now();
         var self = this;
 
         this.timeSum += dt;
@@ -98,7 +97,6 @@ var FieldEngine = cc.Class.extend({
 
         events.simCall.steps = events.simEnd.steps = simSteps;
 
-
         this.setDtAndDispatch(dt, events.simCall);
 
         for (var i = 0; i < simSteps; i++) {
@@ -115,7 +113,6 @@ var FieldEngine = cc.Class.extend({
         }
         this.setDtAndDispatch(dt, events.simEnd);
         this.setDtAndDispatch(dt, events.loopEnd);
-        //console.log(Date.now() - time)
     },
 
     injectThing: function(thing) {

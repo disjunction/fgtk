@@ -19,7 +19,11 @@ _p.advance = function(dt) {
         if (!payload) {
             break;
         }
-        this.eventDispatcher.dispatch(payload);
+        if (typeof payload == 'function') {
+            payload();
+        } else {
+            this.eventDispatcher.dispatch(payload);
+        }
     }
 };
 

@@ -91,6 +91,13 @@ var ModuleCocos = ModuleAbstract.extend({
         }.bind(this));
     },
     removeThing: function(thing) {
+        // remove subthings recursively
+        if (thing.things) {
+            for (var j in thing.things) {
+                this.removeThing(thing.things[j]);
+            }
+        }
+        
         if (!thing.state) return;
         for (var i in thing.state.nodes) {
             thing.state.nodes[i].removeFromParent();

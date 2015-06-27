@@ -104,6 +104,17 @@ var Interactor = cc.Class.extend({
         });
     },
 
+    /**
+     * extracted as a method to allow consumers to fire it manually
+     */
+    fireChanged: function() {
+        this.dispatcher.dispatch({
+            type: "interstateChanged",
+            i: this.i
+        });
+        this.i.changed = false;
+    },
+
     processEvent: function(name, event) {
         var code = event.keyCode;
 
@@ -128,11 +139,7 @@ var Interactor = cc.Class.extend({
                     break;
             }
             if (this.i.changed) {
-                this.dispatcher.dispatch({
-                    type: "interstateChanged",
-                    i: this.i
-                });
-                this.i.changed = false;
+                this.fireChanged();
             }
         }
 
