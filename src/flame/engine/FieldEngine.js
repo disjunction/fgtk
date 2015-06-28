@@ -88,6 +88,14 @@ var FieldEngine = cc.Class.extend({
 
         this.simAccumulator += dt;
         var simSteps = Math.floor(this.simAccumulator / this.simStep);
+
+        if (this.opts.config.fe && this.opts.config.fe.discardSteps && this.opts.config.fe.discardSteps < simSteps) {
+            console.log('discarded ' + (simSteps - 1));
+            this.scheduler.advance(dt - this.simStep);
+            this.simAccumulator = this.simStep;
+            simSteps = 1;
+        }
+
         if (this.opts.config.fe && this.opts.config.fe.maxSimSteps) {
             if (this.opts.config.fe.maxSimSteps < simSteps) {
                 console.log('limited ' + simSteps);

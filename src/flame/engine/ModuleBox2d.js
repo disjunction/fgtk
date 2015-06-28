@@ -67,7 +67,7 @@ var ModuleBox2d = ModuleAbstract.extend({
 
     syncThingFromBody: function(thing, dt) {
         if (thing.pup) {
-            this.fe.serializer.opts.thingSerializer.applyPhisicsBundleToBody(thing, thing.pup);
+            this.fe.opts.fieldSerializer.opts.thingSerializer.applyPhisicsBundleToBody(thing, thing.pup);
             thing.pup = null;
         } else {
             thing.l = thing.body.GetPosition();
