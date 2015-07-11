@@ -143,9 +143,18 @@ _p.scrolledLocation2Target = function (point) {
 };
 
 _p.applyAnimation = function (node) {
+    // explicitly forbidden animation
+    if (node.ani === false) {
+        return;
+    }
     if (node.currentAction) {
         node.stopAction(node.currentAction);
         delete node.currentAction;
+    }
+    if (node.ani && node.compiledAni) {
+        node.currentAction = node.compiledAni;
+        node.runAction(node.currentAction);
+        return;
     }
     if (node.plan && node.plan.compiledAni) {
         node.currentAction = node.plan.compiledAni.copy();

@@ -46,28 +46,33 @@ _p.makeState = function(thingPlan, stateName, parentState) {
 
         newNodePlan.name = i;
 
-        if (newNodePlan.inherit && parentState && parentState.nodes[newNodePlan.inherit]) {
-            node = parentState.nodes[newNodePlan.inherit];
-            if (newNodePlan.ani) {
-                node.plan.ani = newNodePlan.ani;
-                // cache the compiledAni in the newPlanNode, even if node.plan stays the same (inherited)
-                if (!newNodePlan.compiledAni) {
-                    newNodePlan.compiledAni = AbstractCocosNode.prototype.compileAnimation.call(this, node.plan);
+        if (newNodePlan.inherit) {
+            if (parentState && parentState.nodes[newNodePlan.inherit]) {
+                node = parentState.nodes[newNodePlan.inherit];
+
+                if (newNodePlan.ani) {
+                    node.ani = newNodePlan.ani;
+
+                    // cache the compiledAni in the newPlanNode, even if node.plan stays the same (inherited)
+                    if (!newNodePlan.compiledAni) {
+                        if (node.plan.spriteCache) {
+                            newNodePlan.spriteCache = node.plan.spriteCache;
+                        }
+                        newNodePlan.compiledAni = AbstractCocosNode.prototype.compileAnimation.call(this, newNodePlan);
+                        console.log('compiled new');
+                    }
+                    node.compiledAni = newNodePlan.compiledAni.copy();
+                    console.log('compiled assigned');
+                } else {
+                    delete node.ani;
+                    delete node.compiledAni;
                 }
-                node.plan.compiledAni = newNodePlan.compiledAni;
+
+                node.inherited = true;
             } else {
-                delete node.plan.ani;
-                delete node.plan.compiledAni;
+                console.warn('failed to inherit ' + i);
+                continue;
             }
-
-            // the original plan properties are overwritten by the new plan ones
-            for (var j in newNodePlan) {
-                if (j != 'inherit' && j != 'ani') {
-                    //node.plan[j] = newNodePlan[j];
-                }
-            }
-
-            node.inherited = true;
         } else {
             node = this.opts.nb.makeNode(newNodePlan);
         }
