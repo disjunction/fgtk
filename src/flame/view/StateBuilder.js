@@ -59,10 +59,8 @@ _p.makeState = function(thingPlan, stateName, parentState) {
                             newNodePlan.spriteCache = node.plan.spriteCache;
                         }
                         newNodePlan.compiledAni = AbstractCocosNode.prototype.compileAnimation.call(this, newNodePlan);
-                        console.log('compiled new');
                     }
                     node.compiledAni = newNodePlan.compiledAni.copy();
-                    console.log('compiled assigned');
                 } else {
                     delete node.ani;
                     delete node.compiledAni;
