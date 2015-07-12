@@ -13,6 +13,7 @@ function Sibling(opts) {
     this.playerId = opts.playerId;
 
     this.name = opts.name || 'Anonymous ' + this.id;
+    this.settings = {};
 }
 
 module.exports = Sibling;

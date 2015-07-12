@@ -116,9 +116,6 @@ var Interactor = cc.Class.extend({
     },
 
     processEvent: function(name, event) {
-        if (!this.i.enabled) {
-            return;
-        }
 
         var code = event.keyCode;
 

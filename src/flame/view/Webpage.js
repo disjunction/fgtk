@@ -1,7 +1,10 @@
+/*jslint node: true, browser: true */
 "use strict";
 
 var cc = require('cc'),
-    EventDispatcher = require('smog').util.EventDispatcher;
+    smog = require('fgtk/smog'),
+    EventDispatcher = smog.util.EventDispatcher,
+    util = smog.util.util;
 
 var Webpage = cc.Class.extend({
     ctor: function(opts) {
@@ -14,6 +17,20 @@ var Webpage = cc.Class.extend({
                 throw new Error('window object not provided and not found in global scope');
         }
         this.eventDispatcher = new EventDispatcher();
+    },
+
+    updateSiblnigFromLocalStorage: function(sibling) {
+        if (!localStorage) return;
+        var stored = localStorage.getItem('dispace-sibling-settings');
+        if (!stored) return;
+        stored = JSON.parse(stored);
+        sibling.settings = util.combineObjects(sibling.settings, stored);
+    },
+
+    persistSibling: function(sibling) {
+        if (!localStorage) return;
+        var stored = JSON.stringify(sibling.settings);
+        localStorage.setItem('dispace-sibling-settings', stored);
     },
     _params: null,
 });
@@ -38,7 +55,7 @@ cc.defineGetterSetter(_p, '$', function() {
 });
 
 cc.defineGetterSetter(_p, 'params', function() {
-    if (this._params == null) {
+    if (this._params === null) {
             this._params = {};
             var match,
                 pl     = /\+/g,  // Regex for replacing addition symbol with a space

@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var cc = require('cc');
@@ -13,8 +14,6 @@ var Viewport = cc.Class.extend({
         this.opts = opts;
 
         this.nb = this.opts.nb;
-
-        this.soundPlayer = null;
 
         this.scale = 1;
 
@@ -47,22 +46,22 @@ _p.addNodeToLayer = function(node, layerId) {
             layerId = node.plan.layer;
         }
     }
-    
+
     if (node.plan.zIndex) {
         zIndex = node.plan.zIndex;
     } else if (node.plan.elevation) {
         zIndex = node.plan.elevation * 100;
         //layerId += node.plan.elevation;
     }
-    
+
     if (this.scrolled[layerId]) {
         this.scrolled[layerId].addChild(node, zIndex);
     } else if (this[layerId]) {
         this[layerId].addChild(node, zIndex);
     } else {
-        throw new Error('unknown layerId ' + layerId)
+        throw new Error('unknown layerId ' + layerId);
     }
-    
+
 };
 
 _p.addStateToLayer = function(state) {
@@ -80,7 +79,7 @@ _p.addLayersTo = function(layer) {
 };
 
 _p.locationToPosition = function(point) {
-    throw Error('must be implemented in concrete Viewport')
+    throw Error('must be implemented in concrete Viewport');
 };
 
 

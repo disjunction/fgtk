@@ -46,7 +46,9 @@ var FieldEngine = cc.Class.extend({
 
         this.fd = new EventDispatcher();
         this.scheduler = new EventScheduler(this.fd, new SchedulingQueue());
-        this.field = new Field();
+
+        this.field = opts.field || new Field();
+        delete opts.field;
 
         this.siblingMap = {};
         this.thingMap = {};
