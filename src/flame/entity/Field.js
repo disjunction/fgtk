@@ -9,7 +9,7 @@ var Field = cc.Class.extend({
     ctor: function(opts) {
         this.opts = opts || {};
         this.things = [];
-        this.size = this.size = {width: 128, height: 128};
+        this.size = this.opts.size || {width: 128, height: 128};
     },
     push: function(thing) {
         this.things.push(thing);

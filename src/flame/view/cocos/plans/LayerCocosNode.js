@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var cc = require('cc'),
@@ -8,7 +9,7 @@ var LayerCocosNode = AbstractCocosNode.extend({
         var node = cc.Layer.create();
         return node;
     },
-    
+
     hydratePlan: function(plan) {
         return plan;
     }

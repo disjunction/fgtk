@@ -16,11 +16,20 @@ var StateBuilder = function(opts) {
 
 var _p = StateBuilder.prototype;
 
-_p.inlcudeNodePlans = function(includeTo, includeDef, stateName) {
-    var plan = this.opts.nb.opts.cosmosManager.get(includeDef.planSrc),
+_p.inlcudeNodePlans = function(targetPlan, includeTo, includeDef, stateName) {
+    var i;
+
+    if (Array.isArray(includeDef)) {
+        for (i = 0; i < includeDef.length; i++) {
+            this.inlcudeNodePlans(targetPlan, includeTo, includeDef[i], stateName);
+        }
+        return;
+    }
+
+    var plan = includeDef.planSrc ? this.opts.nb.opts.cosmosManager.get(includeDef.planSrc) : targetPlan,
         includeState = includeDef.state || stateName,
         state = this.makeState(plan, includeState);
-    for (var i in state.nodes) {
+    for (i in state.nodes) {
         includeTo.nodes[i] = state.nodes[i];
     }
 };
@@ -37,7 +46,7 @@ _p.makeState = function(thingPlan, stateName, parentState) {
             continue;
         }
         if (i == '$include') {
-            this.inlcudeNodePlans(state, thingPlan.states[stateName][i], stateName);
+            this.inlcudeNodePlans(thingPlan, state, thingPlan.states[stateName][i], stateName);
             continue;
         }
 
@@ -49,6 +58,10 @@ _p.makeState = function(thingPlan, stateName, parentState) {
         if (newNodePlan.inherit) {
             if (parentState && parentState.nodes[newNodePlan.inherit]) {
                 node = parentState.nodes[newNodePlan.inherit];
+
+                if (node.currentAction && node.compiledAni) {
+                    node.stopAction(node.compiledAni);
+                }
 
                 if (newNodePlan.ani) {
                     node.ani = newNodePlan.ani;
@@ -62,7 +75,7 @@ _p.makeState = function(thingPlan, stateName, parentState) {
                     }
                     node.compiledAni = newNodePlan.compiledAni.copy();
                 } else {
-                    delete node.ani;
+                    node.ani = false;
                     delete node.compiledAni;
                 }
 

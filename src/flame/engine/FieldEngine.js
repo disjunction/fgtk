@@ -154,7 +154,7 @@ var FieldEngine = cc.Class.extend({
     },
 
     injectField: function(f) {
-        for (var i =0; i < f.things.length; i++) {
+        for (var i = 0; i < f.things.length; i++) {
             this.injectThing(f.things[i]);
         }
     },

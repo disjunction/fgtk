@@ -130,4 +130,19 @@ _p.getAllInDirectory = function(path, recursive) {
     return result;
 };
 
+/**
+ * @param  {Array.[string]|string} pathArray
+ * @return {Array.[plan]}
+ */
+_p.getByArray = function(pathArray) {
+    if (!Array.isArray(pathArray)) {
+        return [this.get(pathArray)];
+    }
+    var plans = [];
+    for (var i = 0; i < pathArray.length; i++) {
+        plans.push(this.get(pathArray[i]));
+    }
+    return plans;
+};
+
 module.exports = CosmosManager;

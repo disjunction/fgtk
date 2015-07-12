@@ -16,7 +16,7 @@ var PlayEffect = cc.ActionInstant.extend({
         return new cc.Hide();
     },
     clone:function(){
-        // do not clone, nothing can't be cahnged anyway
+        // do not clone, nothing can't be changed anyway
         return this;
     }
 });

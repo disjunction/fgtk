@@ -146,6 +146,7 @@ var ModuleBox2d = ModuleAbstract.extend({
 
         var size = this.fe.field.size,
             points = [];
+
         points.push(new b2.Vec2(size.width, size.height));
         points.push(new b2.Vec2(0, size.height));
         points.push(new b2.Vec2(0, 0));

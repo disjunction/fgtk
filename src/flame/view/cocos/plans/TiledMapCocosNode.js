@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var cc = require('cc'),
@@ -7,7 +8,7 @@ var TiledMapCocosNode = AbstractCocosNode.extend({
     makeNode: function(plan) {
         var src = this.assetManager.resolveSrc(plan.src),
             node;
-        
+
         var TilemapClass = cc.TMXTiledMap.extend({
             ctor : function() {
                 this._super();
@@ -19,7 +20,7 @@ var TiledMapCocosNode = AbstractCocosNode.extend({
         this.applyPlan(plan, node);
         return node;
     },
-    
+
     hydratePlan: function(plan) {
         return plan;
     }

@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var cc = require('cc'),
@@ -6,7 +7,7 @@ var cc = require('cc'),
 var SpriteCocosNode = AbstractCocosNode.extend({
     makeNode: function(plan) {
         var node = cc.Sprite.create(plan.spriteCache.frames[0]);
-        this.applyPlan(plan, node);                
+        this.applyPlan(plan, node);
         return node;
     },
     hydratePlan: function(plan) {
@@ -21,7 +22,7 @@ var SpriteCocosNode = AbstractCocosNode.extend({
                         new cc.SpriteFrame(texture, rect)
                     ]
                 };
-                
+
             if (plan.frames) {
                 for (var i = 0; i < plan.frames.length; i++) {
                     c.frames.push(new cc.SpriteFrame(texture, cc.rect.apply(cc, plan.frames[i])));

@@ -45,7 +45,9 @@ var Driver = cc.Class.extend({
             chasis.applyState(mover, interState);
         }
 
-        chasis.driveBody(thing.body, mover);
+        if (!thing.inert) {
+            chasis.driveBody(thing.body, mover);
+        }
     }
 });
 

@@ -69,5 +69,8 @@ geo.closestRotation = function(a1, a2) {
 	return geo.floorAngle(a2 - a1);
 };
 
+geo.size2Point = function(size) {
+    return {x: size.width, y: size.height};
+};
 
 module.exports = geo;

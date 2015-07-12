@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var cc = require('cc'),
@@ -26,6 +27,7 @@ var BarCocosNode = AbstractCocosNode.extend({
         if (!nodePlan.y) {
             nodePlan.y = - nodePlan.height / 2;
         }
+        AbstractCocosNode.prototype.hydratePlan.call(this, nodePlan);
     }
 });
 
