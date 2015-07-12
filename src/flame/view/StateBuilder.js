@@ -35,6 +35,13 @@ _p.inlcudeNodePlans = function(targetPlan, includeTo, includeDef, stateName) {
     }
 };
 
+/**
+ * FIXME i'm so ugly! decompose me pls!!!
+ * @param  {plan} thingPlan
+ * @param  {string} stateName
+ * @param  {Object} parentState
+ * @return {state}
+ */
 _p.makeState = function(thingPlan, stateName, parentState) {
     var state = {nodes: {}};
     if (!thingPlan.states[stateName]) {
@@ -90,7 +97,7 @@ _p.makeState = function(thingPlan, stateName, parentState) {
 
                 node.inherited = true;
             } else {
-                console.warn('failed to inherit ' + i);
+                //console.warn('failed to inherit ' + i);
                 continue;
             }
         } else {
