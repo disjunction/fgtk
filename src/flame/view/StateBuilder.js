@@ -8,6 +8,7 @@ var cc = require('cc'),
 /**
  * opts:
  * * nb
+ * * config
  * @param opts
   */
 var StateBuilder = function(opts) {
@@ -40,7 +41,7 @@ _p.makeState = function(thingPlan, stateName, parentState) {
         throw new Error('unknown state "' + stateName + '"');
     }
 
-    for (var i in thingPlan.states[stateName]) {
+    plans: for (var i in thingPlan.states[stateName]) {
         // treat nodeId starting with underscore, as comments
         if (i.substring(0,1) == '_') {
             continue;
@@ -52,6 +53,14 @@ _p.makeState = function(thingPlan, stateName, parentState) {
 
         var newNodePlan = thingPlan.states[stateName][i],
             node;
+
+        if (newNodePlan.features && this.opts.config.features) {
+            for (var j in newNodePlan.features) {
+                if (newNodePlan.features[j] != this.opts.config.features[j]) {
+                    continue plans;
+                }
+            }
+        }
 
         newNodePlan.name = i;
 
