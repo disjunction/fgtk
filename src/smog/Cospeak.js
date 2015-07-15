@@ -39,4 +39,8 @@ Cospeak.readSize = function(def) {
     return def;
 };
 
+Cospeak.readAngle = function(def) {
+    return parseFloat(def) * Math.PI / 180;
+};
+
 module.exports = Cospeak;
