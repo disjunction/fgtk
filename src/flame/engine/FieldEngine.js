@@ -2,6 +2,7 @@
 "use strict";
 
 var cc = require('cc'),
+    smog = require('fgtk/smog'),
     Field = require('flame/entity/Field'),
     EventDispatcher = require('smog/util/EventDispatcher'),
     SchedulingQueue = require('smog/util/SchedulingQueue'),
@@ -31,6 +32,9 @@ var FieldEngine = cc.Class.extend({
      * @param opts object
      */
     ctor: function(opts) {
+
+        // identifies the current "room"
+        this.name = 'default';
 
         this.opts = opts || {};
 
@@ -140,9 +144,33 @@ var FieldEngine = cc.Class.extend({
         });
     },
 
+    removeThing: function(thing) {
+        this.fd.dispatch({
+            type: 'removeThing',
+            thing: thing
+        });
+
+        // remove from field
+        this.field.remove(thing);
+        delete this.thingMap[thing.id];
+	},
+
+    injectField: function(f) {
+        for (var i = 0; i < f.things.length; i++) {
+            this.injectThing(f.things[i]);
+        }
+    },
+
     injectAvatar: function(avatar) {
         this.fd.dispatch({
             type: 'injectAvatar',
+            avatar: avatar
+        });
+    },
+
+    removeAvatar: function(avatar) {
+        this.fd.dispatch({
+            type: 'removeAvatar',
             avatar: avatar
         });
     },
@@ -155,22 +183,21 @@ var FieldEngine = cc.Class.extend({
         });
     },
 
-    injectField: function(f) {
-        for (var i = 0; i < f.things.length; i++) {
-            this.injectThing(f.things[i]);
-        }
+    removeSibling: function(sibling) {
+        this.fd.dispatch({
+            type: 'removeSibling',
+            sibling: sibling
+        });
+        delete this.siblingMap[sibling.siblingId];
     },
 
-	removeThing: function(thing) {
+    registerDb: function(db) {
+        this.db = db;
         this.fd.dispatch({
-            type: 'removeThing',
-            thing: thing
+            type: 'registerDb',
+            db: db
         });
-
-		// remove from field
-		this.field.remove(thing);
-        delete this.thingMap[thing.id];
-	},
+    },
 });
 
 module.exports = FieldEngine;

@@ -37,4 +37,25 @@ util.randomElement = function(array) {
     return array[Math.floor(Math.random() * array.length)];
 };
 
+util.getKeys = function(o) {
+    var keys = [];
+    for (var key in o) {
+        if (o.hasOwnProperty(key)) {
+            keys.push(key);
+        }
+    }
+    return keys;
+};
+
+util.countKeys = function(o) {
+    var count = 0;
+    for (var key in o) {
+        if (o.hasOwnProperty(key)) {
+            count++;
+        }
+    }
+    return count;
+};
+
+
 module.exports = util;
