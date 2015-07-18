@@ -121,11 +121,12 @@ _p.getPathsInDirectory = function(path, recursive) {
     return result;
 };
 
-_p.getAllInDirectory = function(path, recursive) {
+_p.getAllInDirectory = function(path, recursive, relative) {
     var paths = this.getPathsInDirectory(path, recursive),
         result = {};
     for (var i = 0; i < paths.length; i++) {
-        result[paths[i]] = this.getResource(paths[i]);
+        var assignPath = relative ? paths[i].substring(path.length + 1) : paths[i];
+        result[assignPath] = this.getResource(paths[i]);
     }
     return result;
 };

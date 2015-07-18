@@ -35,5 +35,10 @@ describe("flame.service.CosmosManager", function() {
         result = cm.getAllInDirectory('thing', true);
         expect(result['thing/bg/vicinity1']).toBeDefined();
         expect(result['thing/bg/vicinity1'].states.basic.bg).toBeDefined();
+
+        result = cm.getAllInDirectory('thing', true, true);
+        expect(result['bg/vicinity1']).toBeDefined();
+        expect(result['bg/vicinity1'].states.basic.bg).toBeDefined();
+
     });
 });

@@ -97,7 +97,7 @@ var ModuleCocos = ModuleAbstract.extend({
                 this.removeThing(thing.things[j]);
             }
         }
-        
+
         if (!thing.state) return;
         for (var i in thing.state.nodes) {
             thing.state.nodes[i].removeFromParent();
@@ -143,7 +143,10 @@ var ModuleCocos = ModuleAbstract.extend({
         this.applyState(thing);
     },
 
-    changeState: function(thing, newState) {
+    changeState: function(thing, newState, ignoreSame) {
+        if (ignoreSame && thing.stateName == newState) {
+            return;
+        }
         var state = this.opts.stateBuilder.makeState(thing.plan, newState, thing.state);
         for (var i in thing.state.nodes) {
             if (thing.state.nodes[i].inherited) {
