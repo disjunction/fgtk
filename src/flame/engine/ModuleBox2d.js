@@ -117,7 +117,8 @@ var ModuleBox2d = ModuleAbstract.extend({
      *
      * @param {RayAbstract} callback
      * @param {Thing} thing
-     * @param float range
+     * @param {float} range
+     * @param {float} radius - starting distance
      * @returns {b2.Vec2} p2 (i.e. furthest possible point in casde of miss)
      */
     rayCastFromThing: function(callback, thing, range, radius) {

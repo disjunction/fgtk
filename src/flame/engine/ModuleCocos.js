@@ -49,14 +49,12 @@ var ModuleCocos = ModuleAbstract.extend({
         var container = this.getContainerNode(thing, containerName);
         node.setPosition(cc.pMult(localL, this.fe.opts.config.ppm));
         container.addChild(node);
+        this.setupNodeForThing(node, thing);
         this.opts.viewport.applyAnimation(node);
     },
     attachStateToContainerNode: function(state, thing, localL, containerName) {
         for (var i in state.nodes) {
             this.attachNodeToContainerNode(state.nodes[i], thing, localL, containerName);
-
-            // currently not needed, as removeSelf should suffice
-            // this.setupNodeForThing(state.nodes[i], thing);
         }
     },
 
@@ -100,19 +98,18 @@ var ModuleCocos = ModuleAbstract.extend({
 
         if (!thing.state) return;
         for (var i in thing.state.nodes) {
+            delete thing.state.nodes[i].backling;
             thing.state.nodes[i].removeFromParent();
         }
         thing.state = null;
     },
     setupNodeForThing: function(node, thing) {
-        if (node.plan.ani &&
-            node.plan.ani[0] == 'sequence' &&
-            node.plan.ani[1][node.plan.ani[1].length -1][0] == 'removeThingNode'
-        ) {
-            node.backlink = {
-                thing: thing
-            };
-        }
+        // this creates ugly cyclic references,
+        // but is necessary for playLocalEffect and removeThingNode
+        node.backlink = {
+            fe: this.fe,
+            thing: thing
+        };
     },
     applyState: function(thing) {
         // set thingShift vectors where needed

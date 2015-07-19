@@ -57,6 +57,7 @@ var Interstate = cc.Class.extend({
             map[array[i]] = true;
         }
         this.map = map;
+        this.changed = true;
     },
     get: function(key) {
         return this.map[key];

@@ -43,4 +43,18 @@ Cospeak.readAngle = function(def) {
     return parseFloat(def) * Math.PI / 180;
 };
 
+/**
+ * Returns value in a range defined as [min, max],
+ * otherwise simply returns a static value
+ * @param  {float|Array.[float]} def
+ * @return {float}
+ */
+Cospeak.readRangedFloat = function(def) {
+    if (Array.isArray(def)) {
+        return Math.random() * (def[1] - def[0]) + def[0];
+    } else {
+        return def;
+    }
+};
+
 module.exports = Cospeak;

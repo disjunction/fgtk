@@ -44,4 +44,16 @@ describe('smog.util.SchedulingQueue', function() {
         );
     });
 
+    it('check: scheduleIn()', function(){
+        var q = new SchedulingQueue(),
+            now = Date.now();
+        q.scheduleIn(1500, "orange");
+        q.scheduleIn(4500, "tomato");
+
+        expect(q.fetch()).toBeNull();
+
+        expect(q.fetchArray(Date.now() + 2000)).toEqual(
+            ["orange"]
+        );
+    });
 });

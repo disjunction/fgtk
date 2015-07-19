@@ -58,7 +58,7 @@ var FieldEngine = cc.Class.extend({
         this.thingMap = {};
 
         /**
-         * sum of all dt since start of the engine
+         * sum of all dt since start of the engine, including drops
          */
         this.timeSum = 0;
 
@@ -150,12 +150,18 @@ var FieldEngine = cc.Class.extend({
             thing: thing
         });
 
+        thing.removed = true;
+
         // remove from field
         this.field.remove(thing);
         delete this.thingMap[thing.id];
 	},
 
     injectField: function(f) {
+        this.fd.dispatch({
+            type: 'injectField',
+            field: f
+        });
         for (var i = 0; i < f.things.length; i++) {
             this.injectThing(f.things[i]);
         }

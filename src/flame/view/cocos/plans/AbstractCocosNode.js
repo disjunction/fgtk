@@ -9,7 +9,8 @@ var customActionMap;
 if (cc.ActionInstant) {
     customActionMap = {
         removeThingNode: require('flame/view/cocos/action/RemoveThingNode'),
-        playEffect: require('flame/view/cocos/action/PlayEffect')
+        playEffect: require('flame/view/cocos/action/PlayEffect'),
+        playLocalEffect: require('flame/view/cocos/action/PlayLocalEffect'),
     };
 } else {
     customActionMap = {};
@@ -89,10 +90,10 @@ var AbstractCocosNode = cc.Class.extend({
                 case 'repeat':
                     return repeat(def);
             }
+
             if (customActionMap[def[0]]) {
                 return customActionMap[def[0]].create.apply(cc, def[1]);
             }
-
 
             if (!def[0] || !cc[def[0]]) {
                 throw new Error('bad action ' + def[0]);

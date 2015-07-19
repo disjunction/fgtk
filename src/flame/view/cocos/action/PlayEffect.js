@@ -4,6 +4,9 @@
 var cc = require('cc'),
     app = require('smog/app');
 
+/**
+ * plays an effect sound which is heard globally
+ */
 var PlayEffect = cc.ActionInstant.extend({
     _effectSrc: "",
     ctor: function(effectSrc) {

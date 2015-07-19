@@ -10,6 +10,7 @@ var cc = require('cc'),
  * * director - cc.director
  * * game - cc.game
  * * canvasId string
+ * * audibility - distance in phisical world, where the sounds still are played
  */
 var CocosViewport = Viewport.extend({
 });
@@ -176,6 +177,15 @@ _p.initAudio = function() {
     ae.setEffectsVolume(typeof audioConfig.effectsVolume != 'undefined' ? audioConfig.effectsVolume : 0.5);
     ae.setMusicVolume(typeof audioConfig.musicVolume != 'undefined' ? audioConfig.musicVolume : 0.5);
     this.audioInitialized = true;
+};
+
+_p.playLocalEffect = function(location, effectUrl) {
+    if (this.opts.audibility) {
+        if (cc.pDistanceSQ(this.camera.cameraLocation, location) > this.opts.audibility * this.opts.audibility) {
+            return;
+        }
+    }
+    this.getAudioEngine().playEffect(effectUrl);
 };
 
 _p.getAudioEngine = function() {

@@ -22,6 +22,11 @@ _p.findIndex = function(time) {
     }
     return null;
 };
+
+_p.scheduleIn = function(time, payload) {
+    return this.schedule(Date.now() + time, payload);
+};
+
 _p.schedule = function(time, payload) {
     var message = [time, payload];
 
@@ -38,6 +43,9 @@ _p.schedule = function(time, payload) {
 };
 
 _p.fetch = function(time) {
+    if (time === undefined) {
+        time = Date.now();
+    }
     if (!this.messages.length) return null;
     if (this.messages[0][0] <= time) {
         return this.messages.shift()[1];
@@ -52,6 +60,10 @@ _p.fetch = function(time) {
  * NO BIG SPLICE! see - http://jsperf.com/multiple-shift-vs-single-splice/4
  */
 _p.fetchArray = function(time) {
+    if (time === undefined) {
+        time = Date.now();
+    }
+
     var message,
         result = [];
 
