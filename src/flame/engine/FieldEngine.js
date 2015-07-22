@@ -16,7 +16,9 @@ var events = {
     simStepCall: {type: 'simStepCall', dt: 0, steps: 0},
     simStepEnd: {type: 'simStepEnd', dt: 0, steps: 0},
     simEnd: {type: 'simEnd', dt: 0},
-    loopEnd: {type: 'loopEnd', dt: 0}
+    loopEnd: {type: 'loopEnd', dt: 0},
+
+    teff: {type: 'teff', thing: null, teff: null},
 };
 
 var FieldEngine = cc.Class.extend({
@@ -204,6 +206,41 @@ var FieldEngine = cc.Class.extend({
             db: db
         });
     },
+
+    /**
+     * teff means "apply Thing EFFeffect"
+     *
+     * this is an often used operation - dispatching an effect for thing
+     * optionally you can provide delay and unteff - the effect removal command
+     * if this operation is often repeated, you might want to have a shared teff/unTeff arrays
+     *
+     * the actual changing of effects is not implemented here,
+     * because each application might want to watch teff changes in its own way
+     *
+     * @param  {Thing} thing  [description]
+     * @param  {Array.[String]|String} teff
+     * @param  {float} delay in seconds relative to current simSum
+     * @param  {Array.[String]|String} unTeff
+     */
+    dispatchTeff: function(thing, teff, delay, unTeff) {
+        var reusableTeff = events.teff;
+        reusableTeff.teff = teff;
+        reusableTeff.thing = thing;
+
+        this.fd.dispatch(reusableTeff);
+
+        if (delay !== undefined) {
+            // need to make a new object because reusable can be changed
+            // until it's ran
+            this.scheduler.scheduleIn(delay,
+            {
+                type: 'teff',
+                thing: thing,
+                teff: unTeff
+            });
+        }
+    },
+
 });
 
 module.exports = FieldEngine;

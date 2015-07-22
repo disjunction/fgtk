@@ -19,12 +19,45 @@ var Thing = cc.Class.extend({
             }
         }
 
+        // short for effects
+        this.e = opts.e || {};
+
         // location
         this.l = opts.l ? opts.l : cc.p();
 
         // angle
         this.a = opts.a ? opts.a : 0.0;
-    }
+    },
+
+    /**
+     * applies strings like "+inert" or "-spawn"
+     * @param  {String} effectString
+     * @return {boolean} returns true if the effect actually changed
+     */
+    applyEffect: function(effectString) {
+        var effect = effectString.substring(1);
+        switch (effectString[0]) {
+            case "+":
+                if (!this.e[effect]) {
+                    this.e[effect] = 1;
+                } else {
+                    this.e[effect]++;
+                }
+                return (this.e[effect] == 1);
+            case "-":
+                if (this.e[effect]) {
+                    this.e[effect]--;
+                    return (this.e[effect] === 0);
+                }
+                return false;
+            default:
+                throw new Error("unexpected effectString: '" + effectString + "'");
+        }
+    },
+
+    hasEffect: function(effect) {
+        return !!this.e[effect];
+    },
 });
 
 /**
