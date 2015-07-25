@@ -40,6 +40,7 @@ var ModuleCocos = ModuleAbstract.extend({
             }
             var plan = this.opts.containerPlans[containerName],
                 container = this.opts.viewport.opts.nb.makeNode(plan);
+            this.syncNodeFromThing(container, thing);
             container.setCascadeOpacityEnabled(true);
             this.opts.viewport.addNodeToLayer(container);
             thing.state.nodes[containerName] = container;
@@ -53,6 +54,7 @@ var ModuleCocos = ModuleAbstract.extend({
         this.setupNodeForThing(node, thing);
         this.opts.viewport.applyAnimation(node);
     },
+    
     attachStateToContainerNode: function(state, thing, localL, containerName) {
         for (var i in state.nodes) {
             this.attachNodeToContainerNode(state.nodes[i], thing, localL, containerName);
@@ -163,45 +165,47 @@ var ModuleCocos = ModuleAbstract.extend({
         this.applyState(thing);
     },
 
+    syncNodeFromThing: function(node, thing) {
+        x = thing.l.x;
+        y = thing.l.y;
+
+        if (node.plan.elevation && !this.opts.skipElevation) {
+            var elevatedRatio = node.plan.elevation * this.config.viewport.elevationShiftRatio;
+            x += (thing.l.x - this.opts.viewport.camera.cameraLocation.x) * elevatedRatio;
+            y += (thing.l.y - this.opts.viewport.camera.cameraLocation.y) * elevatedRatio;
+        }
+
+        if (node.thingShift) {
+            x += node.thingShift.r * Math.cos(thing.a + node.thingShift.a);
+            y += node.thingShift.r * Math.sin(thing.a + node.thingShift.a);
+        }
+
+        x = x *  this.config.ppm;
+        y = y *  this.config.ppm;
+
+        if (node.plan.round) {
+            x = Math.round(x);
+            y = Math.round(y);
+        }
+
+        if (thing.stretcher) {
+            if (thing.stretcher.scaleX < 0) {
+                thing.stretcher.scaleX = thing.stretcher.distance / thing.stretcher.size.width * this.opts.config.ppm;
+                thing.stretcher.primaryNode.setScaleX(thing.stretcher.scaleX);
+            }
+        }
+
+        node.setPositionX(x);
+        node.setPositionY(y);
+        if (!node.plan.skipRotation) {
+            node.setRotation(geo.r2d(-thing.a) - (node.plan.a || 0));
+        }
+    },
+
     syncStateFromThing: function(thing) {
         if (!thing.state) return;
         for (var i in thing.state.nodes) {
-            node = thing.state.nodes[i];
-
-            x = thing.l.x;
-            y = thing.l.y;
-
-            if (node.plan.elevation && !this.opts.skipElevation) {
-                var elevatedRatio = node.plan.elevation * this.config.viewport.elevationShiftRatio;
-                x += (thing.l.x - this.opts.viewport.camera.cameraLocation.x) * elevatedRatio;
-                y += (thing.l.y - this.opts.viewport.camera.cameraLocation.y) * elevatedRatio;
-            }
-
-            if (node.thingShift) {
-                x += node.thingShift.r * Math.cos(thing.a + node.thingShift.a);
-                y += node.thingShift.r * Math.sin(thing.a + node.thingShift.a);
-            }
-
-            x = x *  this.config.ppm;
-            y = y *  this.config.ppm;
-
-            if (node.plan.round) {
-                x = Math.round(x);
-                y = Math.round(y);
-            }
-
-            if (thing.stretcher) {
-                if (thing.stretcher.scaleX < 0) {
-                    thing.stretcher.scaleX = thing.stretcher.distance / thing.stretcher.size.width * this.opts.config.ppm;
-                    thing.stretcher.primaryNode.setScaleX(thing.stretcher.scaleX);
-                }
-            }
-
-            node.setPositionX(x);
-            node.setPositionY(y);
-            if (!node.plan.skipRotation) {
-                node.setRotation(geo.r2d(-thing.a) - (node.plan.a || 0));
-            }
+            this.syncNodeFromThing(thing.state.nodes[i], thing);
         }
     },
 });
