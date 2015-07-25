@@ -40,6 +40,7 @@ var ModuleCocos = ModuleAbstract.extend({
             }
             var plan = this.opts.containerPlans[containerName],
                 container = this.opts.viewport.opts.nb.makeNode(plan);
+            container.setCascadeOpacityEnabled(true);
             this.opts.viewport.addNodeToLayer(container);
             thing.state.nodes[containerName] = container;
         }
@@ -146,10 +147,15 @@ var ModuleCocos = ModuleAbstract.extend({
         }
         var state = this.opts.stateBuilder.makeState(thing.plan, newState, thing.state);
         for (var i in thing.state.nodes) {
-            if (thing.state.nodes[i].inherited) {
-                thing.state.nodes[i].inherited = false;
+            var node = thing.state.nodes[i];
+            if (node.inherited) {
+                node.inherited = false;
             } else {
-                thing.state.nodes[i].removeFromParent();
+                if (node.plan && node.plan.type == "container") {
+                    state.nodes[i] = node;
+                } else {
+                    node.removeFromParent();
+                }
             }
         }
         thing.state = state;
