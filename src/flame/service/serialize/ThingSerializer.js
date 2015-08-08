@@ -4,6 +4,7 @@
 var AbstractSerializer = require('./AbstractSerializer'),
     b2 = require('jsbox2d'),
     smog = require('fgtk/smog'),
+    util = smog.util.util,
     b2p = smog.util.b2p;
 
 // reusable temporary Vec2
@@ -27,7 +28,8 @@ var v1 = new b2.Vec2();
  *         5.2433, // lin. velocity y
  *         2.3435, // angular velocity
  *    ],
- *
+ *    "i": ["a", "l"], // in this example "accelerate" and "turn left"
+ *    "e": {"invuln": 1, "shoot": 2}, // thnig effects
  *    "planSrc": "thing/obstacle/house4x4" // passed only in the initial serialization
  * ]
  *
@@ -70,21 +72,6 @@ _p.makeIterstateBundle = function(thing) {
 
 _p.applyInterstateBundle = function(thing, interstateBundle) {
     thing.i.setArray(interstateBundle);
-};
-
-_p.serializeInitial = function(thing) {
-    var bundle = [
-        thing.id,
-        "inject",
-        {
-            p: this.makePhisicsBundle(thing),
-            planSrc: thing.plan.from
-        }
-    ];
-    if (thing.type !== undefined) {
-        bundle[2].type = thing.type;
-    }
-    return bundle;
 };
 
 /**
@@ -152,6 +139,29 @@ _p.applyPhisicsBundleToBody = function(thing, phisicsBundle) {
     }
 };
 
+_p.makeEffectsBundle = function(thing) {
+    return thing.e;
+};
+
+_p.applyEffectsBundle = function(thing, effectsBundle) {
+    thing.e = util.combineObjects(thing.e, effectsBundle);
+};
+
+_p.serializeInitial = function(thing) {
+    var bundle = [
+        thing.id,
+        "inject",
+        {
+            p: this.makePhisicsBundle(thing),
+            e: this.makeEffectsBundle(thing),
+            planSrc: thing.plan.from
+        }
+    ];
+    if (thing.type !== undefined) {
+        bundle[2].type = thing.type;
+    }
+    return bundle;
+};
 
 _p.unserializeInitial = function(thingBundle) {
     var plan = this.opts.cosmosManager.get(thingBundle[2].planSrc);
@@ -163,6 +173,11 @@ _p.unserializeInitial = function(thingBundle) {
         thing.type = thingBundle[2].type;
     }
     this.applyPhisicsBundleToThing(thing, thingBundle[2].p);
+
+    if (thingBundle[2].e) {
+        this.applyEffectsBundle(thing, thingBundle[2].e);
+    }
+
     return thing;
 };
 

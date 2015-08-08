@@ -54,7 +54,7 @@ var ModuleCocos = ModuleAbstract.extend({
         this.setupNodeForThing(node, thing);
         this.opts.viewport.applyAnimation(node);
     },
-    
+
     attachStateToContainerNode: function(state, thing, localL, containerName) {
         for (var i in state.nodes) {
             this.attachNodeToContainerNode(state.nodes[i], thing, localL, containerName);
@@ -145,6 +145,10 @@ var ModuleCocos = ModuleAbstract.extend({
 
     changeState: function(thing, newState, ignoreSame) {
         if (ignoreSame && thing.stateName == newState) {
+            return;
+        }
+        if (!thing.state) {
+            throw new Error('cannot changeState of empty state')
             return;
         }
         var state = this.opts.stateBuilder.makeState(thing.plan, newState, thing.state);
