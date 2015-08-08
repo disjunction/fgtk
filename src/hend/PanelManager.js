@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var cc = require('cc');
@@ -7,9 +8,6 @@ var PanelManager = cc.Class.extend({
         this.opts = opts || {};
         if (!this.opts.webpage) {
             throw new Error('webpage expected in opts');
-        }
-        if (!this.opts.eventDispatcher) {
-            throw new Error('eventDispatcher expected in opts');
         }
         this.loadedControllers = {};
         this.placeholders = this.opts.placeholders || {};
@@ -33,7 +31,7 @@ var PanelManager = cc.Class.extend({
     },
     loadPanel: function (placeholderId, panelName, params) {
         var placeholder = this.getPlaceholder(placeholderId);
-        
+
         if (this.loadedControllers[placeholderId]) {
             placeholder.addClass('hend-hidden-panel');
             if (this.loadedControllers[placeholderId].unload) {
@@ -41,7 +39,7 @@ var PanelManager = cc.Class.extend({
             }
             this.loadedControllers = null;
         }
-        
+
         var panelDescriptor = this.getPanelDescriptor(panelName);
         var me = this;
         this.opts.webpage.$.get(panelDescriptor.url, params, function (data) {
@@ -49,12 +47,13 @@ var PanelManager = cc.Class.extend({
             placeholder.removeClass('hend-hidden-panel').addClass('hend-shown-panel');
             var controller = new panelDescriptor.controllerClass(placeholderId, me, params);
             this.loadedControllers[placeholderId] = controller;
-            
+
             var event = {
-                type: 'panelLoaded',
                 panelName: panelName
             };
-            this.opts.eventDispatcher.dispatch(event);
+            if (this.opts.eventDispatcher) {
+                this.opts.eventDispatcher.channel("panelLoaded").broadcast(event);
+            }
         });
     }
 });

@@ -3,7 +3,6 @@
 
 var cc = require('cc'),
     smog = require('fgtk/smog'),
-    EventDispatcher = smog.util.EventDispatcher,
     util = smog.util.util;
 
 var Webpage = cc.Class.extend({
@@ -16,7 +15,6 @@ var Webpage = cc.Class.extend({
         } else {
                 throw new Error('window object not provided and not found in global scope');
         }
-        this.eventDispatcher = new EventDispatcher();
     },
 
     updateSiblnigFromLocalStorage: function(sibling) {

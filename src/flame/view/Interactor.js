@@ -1,5 +1,6 @@
 var cc = require('cc'),
-    smog = require('fgtk/smog');
+    smog = require('fgtk/smog'),
+    Radiopaque = require('radiopaque');
 
 /**
  * opts.layer - cocs2d.nodes.Layer to bind to
@@ -88,7 +89,7 @@ var Interactor = cc.Class.extend({
         opts = opts || {layout: {states: {}, events: {}}};
     	this.i = new Interactor.Interstate();
     	this.layout = opts.layout;
-        this.dispatcher = new smog.util.EventDispatcher();
+        this.dispatcher = Radiopaque.create();
     },
 
     fireEvent: function(eventName, nestedEvent) {
@@ -99,18 +100,14 @@ var Interactor = cc.Class.extend({
             return;
         }
 
-        this.dispatcher.dispatch({
-            type: eventName,
-            event: nestedEvent
-        });
+        this.dispatcher.channel(eventName).broadcast(nestedEvent);
     },
 
     /**
      * extracted as a method to allow consumers to fire it manually
      */
     fireChanged: function() {
-        this.dispatcher.dispatch({
-            type: "interstateChanged",
+        this.dispatcher.channel("interstateChanged").broadcast({
             i: this.i
         });
         this.i.changed = false;
@@ -183,10 +180,7 @@ var Interactor = cc.Class.extend({
         cc.eventManager.addListener({
             event: cc.EventListener.MOUSE,
             onMouseMove: function(event){
-                this.dispatcher.dispatch({
-                    type: 'mouseMove',
-                    event: event
-                });
+                this.dispatcher.channel("mouseMove").broadcast(event);
             }.bind(this),
             onMouseUp: function(event){
                 this.processEvent("keyUp", event);
