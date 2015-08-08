@@ -16,6 +16,10 @@ var AbstractChasis = cc.Class.extend({
 
     drive: function(thing, driveOn) {
         throw new Error('drive() must be implemented in subclass of AbstractChasis');
+    },
+
+    applyState: function(thing, driveOn) {
+        throw new Error('applyState() must be implemented in subclass of AbstractChasis');
     }
 });
 

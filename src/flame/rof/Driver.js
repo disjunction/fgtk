@@ -45,7 +45,7 @@ var Driver = cc.Class.extend({
             chasis.applyState(mover, interState);
         }
 
-        if (thing.isControlled()) {
+        if (!thing.removed && !thing.hasEffect('inert')) {
             chasis.driveBody(thing.body, mover);
         }
     }

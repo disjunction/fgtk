@@ -29,7 +29,7 @@ describe ('flame.view.Interactor', function() {
             layout: layout
         });
 
-        interactor.dispatcher.addListener('interstateChanged', function() {
+        interactor.dispatcher.channel('interstateChanged').subscribe(function() {
             done();
         });
 
@@ -61,7 +61,7 @@ describe ('flame.view.Interactor', function() {
         });
 
         it ('fires an event for keyDown', function(done) {
-            interactor.dispatcher.addListener('a-down', function() {
+            interactor.dispatcher.channel('a-down').subscribe(function() {
                 done();
             });
             interactor.processEvent("keyDown", {keyCode: Interactor.KEY_A});
@@ -69,10 +69,10 @@ describe ('flame.view.Interactor', function() {
 
         it ('fires two events for keyUp', function(done) {
             var count = 0;
-            interactor.dispatcher.addListener('a-up', function() {
+            interactor.dispatcher.channel('a-up').subscribe(function() {
                 count++;
             });
-            interactor.dispatcher.addListener('aa-up', function() {
+            interactor.dispatcher.channel('aa-up').subscribe(function() {
                 count++;
                 expect(count).toBe(2);
                 done();
