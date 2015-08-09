@@ -207,11 +207,11 @@ var ModuleCocos = ModuleAbstract.extend({
     },
 
     onLoopEnd: function(event) {
+        /*
         this.fe.eq.channel("renderCall").broadcast({
             dt: event.dt
         });
-
-        //this.fe.setDtAndDispatch(event.dt, events.renderCall);
+        */
 
         for (var i = 0; i < this.fe.field.things.length; i++) {
             thing = this.fe.field.things[i];
@@ -219,10 +219,11 @@ var ModuleCocos = ModuleAbstract.extend({
             this.syncStateFromThing(thing);
         }
 
-        //this.fe.setDtAndDispatch(event.dt, events.renderEnd);
+        /*
         this.fe.eq.channel("renderEnd").broadcast({
             dt: event.dt
         });
+        */
     },
 });
 

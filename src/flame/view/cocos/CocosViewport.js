@@ -23,7 +23,7 @@ var _p = CocosViewport.prototype;
 
 _p.initLayers = function () {
     this.scrolled = this.nb.makeLayer({name: 'scrolled'});
-    var sublayers = ['bg', 'shadow', 'obstacle', 'main', 'stuff', 'targets'];
+    var sublayers = ['bg', 'shadow', 'obstacle', 'main', 'stuff', 'roof', 'targets'];
 
     this.camera = {
         scale: 0.5,
