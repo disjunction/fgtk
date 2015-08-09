@@ -7,11 +7,6 @@ var cc = require('cc'),
 
 var x,y,node,thing;
 
-var events = {
-    renderCall: {type: "renderCall", dt: 0},
-    renderEnd: {type: "renderEnd", dt: 0}
-};
-
 /**
  * opts:
  * * viewport
@@ -33,6 +28,17 @@ var ModuleCocos = ModuleAbstract.extend({
 
         this.config = config;
     },
+
+    injectFe: function(fe, name) {
+        ModuleAbstract.prototype.injectFe.call(this, fe, name);
+        this.addNativeListeners([
+            "injectThing",
+            "removeThing",
+            "moveThing",
+            "loopEnd",
+        ]);
+    },
+
     getContainerNode: function(thing, containerName) {
         if (!thing.state.nodes[containerName]) {
             if (!this.opts.containerPlans || !this.opts.containerPlans[containerName]) {
@@ -61,51 +67,6 @@ var ModuleCocos = ModuleAbstract.extend({
         }
     },
 
-    injectFe: function(fe, name) {
-        ModuleAbstract.prototype.injectFe.call(this, fe, name);
-
-        this.fe.fd.addListener('injectThing', function(event) {
-            thing = event.thing;
-            if (!thing.plan) return;
-            this.envision(thing);
-        }.bind(this));
-
-        this.fe.fd.addListener('removeThing', function(event) {
-            this.removeThing(event.thing);
-        }.bind(this));
-
-        this.fe.fd.addListener('moveThing', function(event) {
-            this.syncStateFromThing(event.thing);
-        }.bind(this));
-
-        this.fe.fd.addListener('loopEnd', function(event) {
-            this.fe.setDtAndDispatch(event.dt, events.renderCall);
-
-            for (var i = 0; i < this.fe.field.things.length; i++) {
-                thing = this.fe.field.things[i];
-                if (!thing.state || (thing.plan.static && !thing.plan.elevated)) continue;
-                this.syncStateFromThing(thing);
-            }
-
-            this.fe.setDtAndDispatch(event.dt, events.renderEnd);
-
-        }.bind(this));
-    },
-    removeThing: function(thing) {
-        // remove subthings recursively
-        if (thing.things) {
-            for (var j in thing.things) {
-                this.removeThing(thing.things[j]);
-            }
-        }
-
-        if (!thing.state) return;
-        for (var i in thing.state.nodes) {
-            delete thing.state.nodes[i].backling;
-            thing.state.nodes[i].removeFromParent();
-        }
-        thing.state = null;
-    },
     setupNodeForThing: function(node, thing) {
         // this creates ugly cyclic references,
         // but is necessary for playLocalEffect and removeThingNode
@@ -211,6 +172,57 @@ var ModuleCocos = ModuleAbstract.extend({
         for (var i in thing.state.nodes) {
             this.syncNodeFromThing(thing.state.nodes[i], thing);
         }
+    },
+
+    //////////// EVENTS
+
+    onInjectThing: function(event) {
+        thing = event.thing;
+        if (!thing.plan) return;
+        this.envision(thing);
+    },
+
+    onRemoveThing: function(event) {
+        this.removeThing(event.thing);
+    },
+
+    removeThing: function(thing) {
+        // remove subthings recursively
+        if (thing.things) {
+            for (var j in thing.things) {
+                this.removeThing(thing.things[j]);
+            }
+        }
+
+        if (!thing.state) return;
+        for (var i in thing.state.nodes) {
+            delete thing.state.nodes[i].backling;
+            thing.state.nodes[i].removeFromParent();
+        }
+        thing.state = null;
+    },
+
+    onMoveThing: function(event) {
+        this.syncStateFromThing(event.thing);
+    },
+
+    onLoopEnd: function(event) {
+        this.fe.eq.channel("renderCall").broadcast({
+            dt: event.dt
+        });
+
+        //this.fe.setDtAndDispatch(event.dt, events.renderCall);
+
+        for (var i = 0; i < this.fe.field.things.length; i++) {
+            thing = this.fe.field.things[i];
+            if (!thing.state || (thing.plan.static && !thing.plan.elevated)) continue;
+            this.syncStateFromThing(thing);
+        }
+
+        //this.fe.setDtAndDispatch(event.dt, events.renderEnd);
+        this.fe.eq.channel("renderEnd").broadcast({
+            dt: event.dt
+        });
     },
 });
 

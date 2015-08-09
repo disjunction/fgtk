@@ -4,25 +4,9 @@
 var cc = require('cc'),
     smog = require('fgtk/smog'),
     Field = require('flame/entity/Field'),
-    EventDispatcher = require('smog/util/EventDispatcher'),
-    SchedulingQueue = require('smog/util/SchedulingQueue'),
-    EventScheduler = require('smog/util/EventScheduler'),
     UidGenerator = require('smog/util/UidGenerator');
 
-// reusable event objects. We're avoiding creating new objects this way
-var events = {
-    loopCall: {type: 'loopCall', dt: 0},
-    simCall: {type: 'simCall', dt: 0},
-    simStepCall: {type: 'simStepCall', dt: 0, steps: 0},
-    simStepEnd: {type: 'simStepEnd', dt: 0, steps: 0},
-    simEnd: {type: 'simEnd', dt: 0},
-    loopEnd: {type: 'loopEnd', dt: 0},
-
-    teff: {type: 'teff', thing: null, teff: null},
-};
-
 var FieldEngine = cc.Class.extend({
-
     /**
      * opts:
      * * config
@@ -50,8 +34,33 @@ var FieldEngine = cc.Class.extend({
          */
         this.stats = {};
 
-        this.fd = new EventDispatcher();
-        this.scheduler = new EventScheduler(this.fd, new SchedulingQueue());
+        this.eq = require('radiopaque').create();
+
+        var setDt = function(template, args) {
+                template.dt = args[0];
+            },
+            setDtSteps = function(template, args) {
+                template.dt = args[0];
+                template.steps = args[1];
+            },
+            setDtStep = function(template, args) {
+                template.dt = args[0];
+                template.step = args[1];
+            };
+
+        this.prepared = {
+            loopCall: this.eq.channel("loopCall").prepare(setDt),
+            simCall: this.eq.channel("simCall").prepare(setDtSteps),
+            simStepCall: this.eq.channel("simStepCall").prepare(setDtStep),
+            simStepEnd: this.eq.channel("simStepEnd").prepare(setDtStep),
+            simEnd: this.eq.channel("simEnd").prepare(setDtSteps),
+            loopEnd: this.eq.channel("loopEnd").prepare(setDt),
+
+            teff: this.eq.channel("teff").prepare(function(template, args) {
+                template.thing = args[0];
+                template.teff = args[1];
+            })
+        };
 
         this.field = opts.field || new Field();
         delete opts.field;
@@ -81,17 +90,12 @@ var FieldEngine = cc.Class.extend({
         module.injectFe(this, name);
     },
 
-    setDtAndDispatch: function(dt, event) {
-        event.dt = dt;
-        this.fd.dispatch(event);
-    },
-
     step: function(dt) {
-        var self = this;
+        var prepared = this.prepared;
 
         this.timeSum += dt;
 
-        this.setDtAndDispatch(dt, events.loopCall);
+        prepared.loopCall.execute(dt);
 
 
         this.simAccumulator += dt;
@@ -99,7 +103,7 @@ var FieldEngine = cc.Class.extend({
 
         if (this.opts.config.fe && this.opts.config.fe.discardSteps && this.opts.config.fe.discardSteps < simSteps) {
             console.log('discarded ' + (simSteps - 1));
-            this.scheduler.advance(dt - this.simStep);
+            this.eq.timeIn(dt - this.simStep).run();
             this.simAccumulator = this.simStep;
             simSteps = 1;
         }
@@ -111,24 +115,20 @@ var FieldEngine = cc.Class.extend({
             simSteps = Math.min(simSteps, this.opts.config.fe.maxSimSteps);
         }
 
-        events.simCall.steps = events.simEnd.steps = simSteps;
-
-        this.setDtAndDispatch(dt, events.simCall);
+        prepared.simCall.execute(dt, simSteps);
 
         for (var i = 0; i < simSteps; i++) {
-            events.simStepCall.step = i;
-            this.setDtAndDispatch(this.simStep, events.simStepCall);
+            prepared.simStepCall.execute(this.simStep, i);
 
-            this.scheduler.advance(this.simStep);
+            this.eq.timeIn(this.simStep).run();
 
-            events.simStepEnd.step = i;
-            this.setDtAndDispatch(this.simStep, events.simStepEnd);
+            prepared.simStepEnd.execute(this.simStep, i);
 
             this.simAccumulator -= this.simStep;
             this.simSum += this.simStep;
         }
-        this.setDtAndDispatch(dt, events.simEnd);
-        this.setDtAndDispatch(dt, events.loopEnd);
+        prepared.simEnd.execute(dt, simSteps);
+        prepared.loopEnd.execute(dt);
     },
 
     injectThing: function(thing) {
@@ -140,15 +140,13 @@ var FieldEngine = cc.Class.extend({
         }
         this.field.things.push(thing);
         this.thingMap[thing.id] = thing;
-        this.fd.dispatch({
-            type: 'injectThing',
+        this.eq.channel("injectThing").broadcast({
             thing: thing
         });
     },
 
     removeThing: function(thing) {
-        this.fd.dispatch({
-            type: 'removeThing',
+        this.eq.channel("removeThing").broadcast({
             thing: thing
         });
 
@@ -160,8 +158,7 @@ var FieldEngine = cc.Class.extend({
 	},
 
     injectField: function(f) {
-        this.fd.dispatch({
-            type: 'injectField',
+        this.eq.channel("injectField").broadcast({
             field: f
         });
         for (var i = 0; i < f.things.length; i++) {
@@ -170,30 +167,26 @@ var FieldEngine = cc.Class.extend({
     },
 
     injectAvatar: function(avatar) {
-        this.fd.dispatch({
-            type: 'injectAvatar',
+        this.eq.channel("injectAvatar").broadcast({
             avatar: avatar
         });
     },
 
     removeAvatar: function(avatar) {
-        this.fd.dispatch({
-            type: 'removeAvatar',
+        this.eq.channel("removeAvatar").broadcast({
             avatar: avatar
         });
     },
 
     injectSibling: function(sibling) {
         this.siblingMap[sibling.siblingId] = sibling;
-        this.fd.dispatch({
-            type: 'injectSibling',
+        this.eq.channel("injectSibling").broadcast({
             sibling: sibling
         });
     },
 
     removeSibling: function(sibling) {
-        this.fd.dispatch({
-            type: 'removeSibling',
+        this.eq.channel("removeSibling").broadcast({
             sibling: sibling
         });
         delete this.siblingMap[sibling.siblingId];
@@ -201,8 +194,7 @@ var FieldEngine = cc.Class.extend({
 
     registerDb: function(db) {
         this.db = db;
-        this.fd.dispatch({
-            type: 'registerDb',
+        this.eq.channel("registerDb").broadcast({
             db: db
         });
     },
@@ -223,24 +215,15 @@ var FieldEngine = cc.Class.extend({
      * @param  {Array.[String]|String} unTeff
      */
     dispatchTeff: function(thing, teff, delay, unTeff) {
-        var reusableTeff = events.teff;
-        reusableTeff.teff = teff;
-        reusableTeff.thing = thing;
-
-        this.fd.dispatch(reusableTeff);
+        this.prepared.teff.execute(thing, teff);
 
         if (delay !== undefined) {
-            // need to make a new object because reusable can be changed
-            // until it's ran
-            this.scheduler.scheduleIn(delay,
-            {
-                type: 'teff',
+            this.eq.channel("teff").broadcastIn(delay, {
                 thing: thing,
                 teff: unTeff
             });
         }
     },
-
 });
 
 module.exports = FieldEngine;
