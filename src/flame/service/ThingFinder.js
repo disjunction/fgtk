@@ -10,11 +10,14 @@ var point = new b2.Vec2();
 /**
  * opts:
  * * fe
+ * * world
  * @param opts
   */
 var ThingFinder = cc.Class.extend({
     ctor: function(opts) {
         this.opts = opts;
+
+        this.world = opts.world || opts.fe.m.b.world;
 
         this.dirtyAllFinder = {
             fixtures: [],
@@ -53,7 +56,7 @@ var ThingFinder = cc.Class.extend({
         var aabb = new b2.AABB();
         aabb.lowerBound = lowerBound;
         aabb.upperBound = upperBound;
-        this.opts.fe.m.b.world.QueryAABB(callback, aabb);
+        this.world.QueryAABB(callback, aabb);
     },
 
     findBodyAtLocation: function(l) {
@@ -110,7 +113,10 @@ var ThingFinder = cc.Class.extend({
 
         var bodies = [];
         callback.fixtures.forEach(function(fixture) {
-            bodies.push(fixture.GetBody());
+            var body = fixture.GetBody();
+            if (bodies.indexOf(body) == -1) {
+                bodies.push(fixture.GetBody());
+            }
         });
 
         return bodies;
