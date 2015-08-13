@@ -61,12 +61,32 @@ _p.addNodeToLayer = function(node, layerId) {
     } else {
         throw new Error('unknown layerId ' + layerId);
     }
+};
 
+_p.removeNodeFromLayer = function(node) {
+    // cleanup = false, because we want to re-attach it when needed
+    node.removeFromParent(false);
 };
 
 _p.addStateToLayer = function(state) {
     for (var i in state.nodes) {
         this.addNodeToLayer(state.nodes[i]);
+    }
+};
+
+_p.cleanupChildren = function(node) {
+    var children = node.getChildren();
+    for (var i = 0; i < children.length; i++) {
+        children[i].removeFromParent();
+    }
+};
+
+_p.removeStateFromLayer = function(state) {
+    for (var i in state.nodes) {
+        if (i == "effects") {
+            this.cleanupChildren(state.nodes[i]);
+        }
+        this.removeNodeFromLayer(state.nodes[i]);
     }
 };
 

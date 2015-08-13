@@ -8,6 +8,8 @@ module.exports = {
         BodyBuilder: require('./engine/BodyBuilder'),
         ModuleAbstract: require('./engine/ModuleAbstract'),
         ModuleCocos: require('./engine/ModuleCocos'),
+        ModuleVicinity: require('./engine/ModuleVicinity'),
+        ModuleCocosVicinity: require('./engine/ModuleCocosVicinity'),
         ModuleBox2d: require('./engine/ModuleBox2d')
     },
     entity: {

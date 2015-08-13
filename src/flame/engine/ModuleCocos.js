@@ -48,8 +48,8 @@ var ModuleCocos = ModuleAbstract.extend({
                 container = this.opts.viewport.opts.nb.makeNode(plan);
             this.syncNodeFromThing(container, thing);
             container.setCascadeOpacityEnabled(true);
-            this.opts.viewport.addNodeToLayer(container);
             thing.state.nodes[containerName] = container;
+            this.attachState(thing);
         }
         return thing.state.nodes[containerName];
     },
@@ -75,6 +75,7 @@ var ModuleCocos = ModuleAbstract.extend({
             thing: thing
         };
     },
+
     applyState: function(thing) {
         // set thingShift vectors where needed
         // thingShift defines distance and angle of this node, relative to Thing origin
@@ -92,8 +93,16 @@ var ModuleCocos = ModuleAbstract.extend({
         }
 
         this.syncStateFromThing(thing);
+        this.attachState(thing);
+    },
 
+    /**
+     * method extracted from applyState, to make it overridable by ModuleCocosVicinity
+     * @param  {Thing} thing
+     */
+    attachState: function(thing) {
         this.opts.viewport.addStateToLayer(thing.state);
+        this.syncStateFromThing(thing);
     },
 
     envision: function(thing) {
@@ -174,20 +183,7 @@ var ModuleCocos = ModuleAbstract.extend({
         }
     },
 
-    //////////// EVENTS
-
-    onInjectThing: function(event) {
-        thing = event.thing;
-        if (!thing.plan) return;
-        this.envision(thing);
-    },
-
-    onRemoveThing: function(event) {
-        this.removeThing(event.thing);
-    },
-
     removeThing: function(thing) {
-        // remove subthings recursively
         if (thing.things) {
             for (var j in thing.things) {
                 this.removeThing(thing.things[j]);
@@ -196,10 +192,22 @@ var ModuleCocos = ModuleAbstract.extend({
 
         if (!thing.state) return;
         for (var i in thing.state.nodes) {
-            delete thing.state.nodes[i].backling;
+            delete thing.state.nodes[i].backlink;
             thing.state.nodes[i].removeFromParent();
         }
         thing.state = null;
+    },
+
+    //////////// EVENTS
+
+    onInjectThing: function(event) {
+        thing = event.thing;
+        if (!thing.plan || !thing.plan.states) return;
+        this.envision(thing);
+    },
+
+    onRemoveThing: function(event) {
+        this.removeThing(event.thing);
     },
 
     onMoveThing: function(event) {
@@ -207,23 +215,11 @@ var ModuleCocos = ModuleAbstract.extend({
     },
 
     onLoopEnd: function(event) {
-        /*
-        this.fe.eq.channel("renderCall").broadcast({
-            dt: event.dt
-        });
-        */
-
         for (var i = 0; i < this.fe.field.things.length; i++) {
             thing = this.fe.field.things[i];
             if (!thing.state || (thing.plan.static && !thing.plan.elevated)) continue;
             this.syncStateFromThing(thing);
         }
-
-        /*
-        this.fe.eq.channel("renderEnd").broadcast({
-            dt: event.dt
-        });
-        */
     },
 });
 

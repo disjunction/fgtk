@@ -153,7 +153,7 @@ var ModuleBox2d = ModuleAbstract.extend({
         this.world.Step(event.dt, 8, 3);
         for (var i = 0; i < this.fe.field.things.length; i++) {
             var thing = this.fe.field.things[i];
-            if (thing.body && (thing.body.IsAwake() || thing.pup)) {
+            if (thing.body && !thing.plan.static && (thing.body.IsAwake() || thing.pup)) {
                 this.syncThingFromBody(thing, event.dt);
                 this.prepared.moveThingEvent.execute(thing, event.dt);
             }

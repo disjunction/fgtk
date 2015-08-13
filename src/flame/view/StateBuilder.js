@@ -76,7 +76,11 @@ _p.makeState = function(thingPlan, stateName, parentState) {
                 node = parentState.nodes[newNodePlan.inherit];
 
                 if (node.currentAction && node.compiledAni) {
-                    node.stopAction(node.compiledAni);
+                    // stopping animation on a detatched node produces fatal in cocos
+                    // this is just a workaround
+                    if (node.compiledAni.getOriginalTarget()) {
+                        node.stopAction(node.compiledAni);
+                    }
                 }
 
                 if (newNodePlan.ani) {
@@ -102,6 +106,11 @@ _p.makeState = function(thingPlan, stateName, parentState) {
             }
         } else {
             node = this.opts.nb.makeNode(newNodePlan);
+        }
+
+        // force elevated flag, if at least one node has elevation
+        if (newNodePlan.elevation) {
+            thingPlan.elevated = true;
         }
 
         state.nodes[i] = node;

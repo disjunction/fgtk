@@ -8,7 +8,6 @@ var cc = require('cc'),
  * opts:
  * * nb - node builder
  * * director - cc.director
- * * game - cc.game
  * * canvasId string
  * * audibility - distance in phisical world, where the sounds still are played
  */
@@ -140,7 +139,6 @@ _p.scrolledLocation2Target = function (point) {
     var absCorner = cc.pSub(this.camera.cameraLocation, this.camera.centerShift),
             result = cc.pMult(cc.pSub(point, absCorner), this.camera.pixelScale);
     return result;
-    //return cc.p(Math.round(result.x), Math.round(result.y));
 };
 
 _p.applyAnimation = function (node) {
