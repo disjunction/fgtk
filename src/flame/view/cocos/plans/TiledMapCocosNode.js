@@ -5,18 +5,30 @@ var cc = require('cc'),
     AbstractCocosNode = require('flame/view/cocos/plans/AbstractCocosNode');
 
 var TiledMapCocosNode = AbstractCocosNode.extend({
+
+    ctor: function(opts) {
+        this._super(opts);
+        this.tilemapCache = {};
+        this.tilemapPool = {};
+    },
+
     makeNode: function(plan) {
-        var src = this.assetManager.resolveSrc(plan.src),
+        var from = plan.from,
+            src = this.assetManager.resolveSrc(plan.src),
+            me = this,
             node;
 
-        var TilemapClass = cc.TMXTiledMap.extend({
-            ctor : function() {
-                this._super();
-                this.initWithTMXFile(src);
+        if (plan.from && me.tilemapCache[plan.from]) {
+            node = cc.clone(me.tilemapCache[plan.from]);
+        } else {
+            node = new cc.TMXTiledMap();
+            node.setAnchorPoint(0.5,  0.5);
+            node.initWithTMXFile(src);
+            if (plan.from) {
+                me.tilemapCache[plan.from] = node;
             }
-        });
-        node = new TilemapClass();
-        node.setAnchorPoint(0.5,  0.5);
+        }
+
         this.applyPlan(plan, node);
         return node;
     },
