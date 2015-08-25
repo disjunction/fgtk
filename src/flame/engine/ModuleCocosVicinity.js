@@ -29,6 +29,8 @@ var ModuleCocosVicity = ModuleAbstract.extend({
 
         this.envisionQueue = Radiopaque.create();
         this.hideQueue = Radiopaque.create();
+
+        this.hiddenStates = {};
     },
 
     injectFe: function(fe, name) {
@@ -41,14 +43,24 @@ var ModuleCocosVicity = ModuleAbstract.extend({
         ]);
     },
 
+    getStateKeyByThing: function(thing) {
+        return thing.plan.from + ":" + (thing.stateName || thing.s || 'basic');
+    },
+
     envisionVicinity: function(v) {
         v.visible = true;
         for (var i = 0; i < v.things.length; i++) {
             var thing = v.things[i];
             if (thing.state) {
+
                 if (thing.state.delayed) {
+                    var key = this.getStateKeyByThing(thing);
+                    if (this.hiddenStates[key] && this.hiddenStates[key].length > 0) {
+                        thing.state = this.hiddenStates[key].pop();
+                    } else {
+                        this.envision(thing);
+                    }
                     thing.state.delayed = false;
-                    this.envision(thing);
                 }
 
                 this.opts.viewport.addStateToLayer(thing.state);
@@ -60,6 +72,8 @@ var ModuleCocosVicity = ModuleAbstract.extend({
     },
 
     hideState: function(thing) {
+        var isDelayed = false;
+
         for (var i in thing.state.nodes) {
             var node = thing.state.nodes[i];
             if (node.plan && node.plan.cleanupOnHide) {
@@ -67,7 +81,22 @@ var ModuleCocosVicity = ModuleAbstract.extend({
                 delete thing.state.nodes[i];
             }
         }
+
+        if (thing.state.delayed === false && thing.plan.static && thing.plan.from) {
+            isDelayed = true;
+            var key = this.getStateKeyByThing(thing);
+            if (this.hiddenStates[key] === undefined) {
+                this.hiddenStates[key] = [];
+            }
+
+            this.hiddenStates[key].push(thing.state);
+        }
+
         this.opts.viewport.removeStateFromLayer(thing.state);
+
+        if (isDelayed) {
+            thing.state = {nodes: {}, delayed: true};
+        }
     },
 
     hideVicinity: function(v) {
@@ -104,7 +133,6 @@ var ModuleCocosVicity = ModuleAbstract.extend({
             plan = event.thing.plan;
         if (plan.states && plan.cocos && plan.cocos.delayedEnvision) {
             thing.state = {nodes: {}, delayed: true};
-            thing.stateName = "delayed";
             return;
         }
 
@@ -118,7 +146,7 @@ var ModuleCocosVicity = ModuleAbstract.extend({
                 endX = vicinity.x + this.vicinityShowRange,
                 startY = Math.max(0, vicinity.y - this.vicinityShowRange),
                 endY = vicinity.y + this.vicinityShowRange,
-                hideDiff = this.vicinityShowRange - this.vicinityHideRange,
+                hideDiff = this.vicinityHideRange - this.vicinityShowRange,
                 v;
 
             // hide all within hide range, which are not visible area
