@@ -13,8 +13,8 @@ var RemoveThingNode = cc.ActionInstant.extend({
     },
     update:function(dt){
         var b = this.target.backlink;
-        if (b && b.thing && b.thing.state && b.thing.state.nodes) {
-            delete b.thing.state.nodes[this.target.plan.name];
+        if (b && b.thing && b.thing.look && b.thing.look.nodes) {
+            delete b.thing.look.nodes[this.target.plan.name];
         }
         this.target.removeFromParent(this._isNeedCleanUp);
     },

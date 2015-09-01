@@ -68,9 +68,9 @@ _p.removeNodeFromLayer = function(node) {
     node.removeFromParent(false);
 };
 
-_p.addStateToLayer = function(state) {
-    for (var i in state.nodes) {
-        this.addNodeToLayer(state.nodes[i]);
+_p.addLookToLayer = function(look) {
+    for (var i in look.nodes) {
+        this.addNodeToLayer(look.nodes[i]);
     }
 };
 
@@ -81,12 +81,12 @@ _p.cleanupChildren = function(node) {
     }
 };
 
-_p.removeStateFromLayer = function(state) {
-    for (var i in state.nodes) {
+_p.removeLookFromLayer = function(look) {
+    for (var i in look.nodes) {
         if (i == "effects") {
-            this.cleanupChildren(state.nodes[i]);
+            this.cleanupChildren(look.nodes[i]);
         }
-        this.removeNodeFromLayer(state.nodes[i]);
+        this.removeNodeFromLayer(look.nodes[i]);
     }
 };
 

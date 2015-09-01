@@ -25,7 +25,7 @@ module.exports = {
         Viewport: require('./view/Viewport'),
         Webpage: require('./view/Webpage'),
         Interactor: require('./view/Interactor'),
-        StateBuilder: require('./view/StateBuilder'),
+        LookBuilder: require('./view/LookBuilder'),
         fabric: {
             FabricNodeBuilder: require('./view/fabric/FabricNodeBuilder'),
             FabricViewport: require('./view/fabric/FabricViewport')

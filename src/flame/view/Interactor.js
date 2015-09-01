@@ -1,3 +1,6 @@
+/*jslint node: true */
+"use strict";
+
 var cc = require('cc'),
     smog = require('fgtk/smog'),
     Radiopaque = require('radiopaque');
@@ -74,8 +77,10 @@ var Interstate = cc.Class.extend({
     },
     applySerial: function(array) {
         var map = {};
-        if (array) for (var i = 0; i < array.length; i++) {
-            map[array[i]] = true;
+        if (array) {
+            for (var i = 0; i < array.length; i++) {
+                map[array[i]] = true;
+            }
         }
         this.map = map;
     }

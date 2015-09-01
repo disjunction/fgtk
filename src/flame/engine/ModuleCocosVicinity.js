@@ -13,7 +13,7 @@ var cc = require('cc'),
  *
  * opts:
  * * viewport
- * * stateBuilder
+ * * lookBuilder
  * * config
  */
 var ModuleCocosVicity = ModuleAbstract.extend({
@@ -30,7 +30,7 @@ var ModuleCocosVicity = ModuleAbstract.extend({
         this.envisionQueue = Radiopaque.create();
         this.hideQueue = Radiopaque.create();
 
-        this.hiddenStates = {};
+        this.hiddenLooks = {};
     },
 
     injectFe: function(fe, name) {
@@ -43,7 +43,7 @@ var ModuleCocosVicity = ModuleAbstract.extend({
         ]);
     },
 
-    getStateKeyByThing: function(thing) {
+    getLookKeyByThing: function(thing) {
         return thing.plan.from + ":" + (thing.stateName || thing.s || 'basic');
     },
 
@@ -51,51 +51,51 @@ var ModuleCocosVicity = ModuleAbstract.extend({
         v.visible = true;
         for (var i = 0; i < v.things.length; i++) {
             var thing = v.things[i];
-            if (thing.state) {
+            if (thing.look) {
 
-                if (thing.state.delayed) {
-                    var key = this.getStateKeyByThing(thing);
-                    if (this.hiddenStates[key] && this.hiddenStates[key].length > 0) {
-                        thing.state = this.hiddenStates[key].pop();
+                if (thing.look.delayed) {
+                    var key = this.getLookKeyByThing(thing);
+                    if (this.hiddenLooks[key] && this.hiddenLooks[key].length > 0) {
+                        thing.look = this.hiddenLooks[key].pop();
                     } else {
                         this.envision(thing);
                     }
-                    thing.state.delayed = false;
+                    thing.look.delayed = false;
                 }
 
-                this.opts.viewport.addStateToLayer(thing.state);
-                this.syncStateFromThing(thing);
+                this.opts.viewport.addLookToLayer(thing.look);
+                this.syncLookFromThing(thing);
             }
         }
 
         this.displayed.push(v);
     },
 
-    hideState: function(thing) {
+    hideLook: function(thing) {
         var isDelayed = false;
 
-        for (var i in thing.state.nodes) {
-            var node = thing.state.nodes[i];
+        for (var i in thing.look.nodes) {
+            var node = thing.look.nodes[i];
             if (node.plan && node.plan.cleanupOnHide) {
                 node.removeFromParent();
-                delete thing.state.nodes[i];
+                delete thing.look.nodes[i];
             }
         }
 
-        if (thing.state.delayed === false && thing.plan.static && thing.plan.from) {
+        if (thing.look.delayed === false && thing.plan.static && thing.plan.from) {
             isDelayed = true;
-            var key = this.getStateKeyByThing(thing);
-            if (this.hiddenStates[key] === undefined) {
-                this.hiddenStates[key] = [];
+            var key = this.getLookKeyByThing(thing);
+            if (this.hiddenLooks[key] === undefined) {
+                this.hiddenLooks[key] = [];
             }
 
-            this.hiddenStates[key].push(thing.state);
+            this.hiddenLooks[key].push(thing.look);
         }
 
-        this.opts.viewport.removeStateFromLayer(thing.state);
+        this.opts.viewport.removeLookFromLayer(thing.look);
 
         if (isDelayed) {
-            thing.state = {nodes: {}, delayed: true};
+            thing.look = {nodes: {}, delayed: true};
         }
     },
 
@@ -103,15 +103,15 @@ var ModuleCocosVicity = ModuleAbstract.extend({
         v.visible = false;
         for (var i = 0; i < v.things.length; i++) {
             var thing = v.things[i];
-            if (thing.state) {
-                this.hideState(thing);
+            if (thing.look) {
+                this.hideLook(thing);
             }
         }
 
         util.removeOneFromArray(v, this.displayed);
     },
 
-    attachState: function(thing) {
+    attachLook: function(thing) {
         if (thing.vicinity) {
             if (thing.vicinity.visible) {
                 this._super(thing);
@@ -121,7 +121,7 @@ var ModuleCocosVicity = ModuleAbstract.extend({
         }
     },
 
-    syncStateFromThing: function(thing) {
+    syncLookFromThing: function(thing) {
         if (thing.vicinity && !thing.vicinity.visible) {
             return;
         }
@@ -132,7 +132,7 @@ var ModuleCocosVicity = ModuleAbstract.extend({
         var thing = event.thing,
             plan = event.thing.plan;
         if (plan.states && plan.cocos && plan.cocos.delayedEnvision) {
-            thing.state = {nodes: {}, delayed: true};
+            thing.look = {nodes: {}, delayed: true};
             return;
         }
 
@@ -181,15 +181,15 @@ var ModuleCocosVicity = ModuleAbstract.extend({
 
     onChangeVicinity: function(event) {
         var thing = event.thing;
-        if (!thing.state) {
+        if (!thing.look) {
             return;
         }
 
         if (thing.vicinity.visible != event.vicinity.visible) {
             if (event.vicinity.visible) {
-                this.opts.viewport.addStateToLayer(thing.state);
+                this.opts.viewport.addLookToLayer(thing.look);
             } else {
-                this.hideState(thing);
+                this.hideLook(thing);
             }
         }
     },
@@ -207,8 +207,8 @@ var ModuleCocosVicity = ModuleAbstract.extend({
         for (var i = 0; i < this.displayed.length; i++) {
             for (var j = 0; j < this.displayed[i].things.length; j++) {
                 var thing = this.displayed[i].things[j];
-                if (!thing.state || (thing.plan.static && !thing.plan.elevated)) continue;
-                this.syncStateFromThing(thing);
+                if (!thing.look || (thing.plan.static && !thing.plan.elevated)) continue;
+                this.syncLookFromThing(thing);
             }
         }
     }

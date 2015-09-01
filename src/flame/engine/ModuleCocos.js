@@ -10,7 +10,7 @@ var x,y,node,thing;
 /**
  * opts:
  * * viewport
- * * stateBuilder
+ * * lookBuilder
  * * config
  */
 var ModuleCocos = ModuleAbstract.extend({
@@ -40,7 +40,7 @@ var ModuleCocos = ModuleAbstract.extend({
     },
 
     getContainerNode: function(thing, containerName) {
-        if (!thing.state.nodes[containerName]) {
+        if (!thing.look.nodes[containerName]) {
             if (!this.opts.containerPlans || !this.opts.containerPlans[containerName]) {
                 throw new Error('trying to get an unknown container: ' + containerName);
             }
@@ -48,10 +48,10 @@ var ModuleCocos = ModuleAbstract.extend({
                 container = this.opts.viewport.opts.nb.makeNode(plan);
             this.syncNodeFromThing(container, thing);
             container.setCascadeOpacityEnabled(true);
-            thing.state.nodes[containerName] = container;
-            this.attachState(thing);
+            thing.look.nodes[containerName] = container;
+            this.attachLook(thing);
         }
-        return thing.state.nodes[containerName];
+        return thing.look.nodes[containerName];
     },
     attachNodeToContainerNode: function(node, thing, localL, containerName) {
         var container = this.getContainerNode(thing, containerName);
@@ -61,9 +61,9 @@ var ModuleCocos = ModuleAbstract.extend({
         this.opts.viewport.applyAnimation(node);
     },
 
-    attachStateToContainerNode: function(state, thing, localL, containerName) {
-        for (var i in state.nodes) {
-            this.attachNodeToContainerNode(state.nodes[i], thing, localL, containerName);
+    attachLookToContainerNode: function(look, thing, localL, containerName) {
+        for (var i in look.nodes) {
+            this.attachNodeToContainerNode(look.nodes[i], thing, localL, containerName);
         }
     },
 
@@ -76,11 +76,11 @@ var ModuleCocos = ModuleAbstract.extend({
         };
     },
 
-    applyState: function(thing) {
+    applyLook: function(thing) {
         // set thingShift vectors where needed
         // thingShift defines distance and angle of this node, relative to Thing origin
-        for (var i in thing.state.nodes) {
-            var node = thing.state.nodes[i];
+        for (var i in thing.look.nodes) {
+            var node = thing.look.nodes[i];
             if (node.plan.x || node.plan.y) {
                 var nodePoint = cc.p(node.plan.x / this.opts.config.ppm || 0, node.plan.y  / this.opts.config.ppm || 0);
                 node.thingShift = {
@@ -92,51 +92,50 @@ var ModuleCocos = ModuleAbstract.extend({
             this.setupNodeForThing(node, thing);
         }
 
-        this.syncStateFromThing(thing);
-        this.attachState(thing);
+        this.syncLookFromThing(thing);
+        this.attachLook(thing);
     },
 
     /**
-     * method extracted from applyState, to make it overridable by ModuleCocosVicinity
+     * method extracted from applyLook, to make it overridable by ModuleCocosVicinity
      * @param  {Thing} thing
      */
-    attachState: function(thing) {
-        this.opts.viewport.addStateToLayer(thing.state);
-        this.syncStateFromThing(thing);
+    attachLook: function(thing) {
+        this.opts.viewport.addLookToLayer(thing.look);
+        this.syncLookFromThing(thing);
     },
 
     envision: function(thing) {
         var stateName = thing.s || 'basic';
-        var state = this.opts.stateBuilder.makeState(thing.plan, stateName);
-        thing.state = state;
+        thing.look = this.opts.lookBuilder.makeLook(thing.plan, stateName);
         thing.stateName = stateName;
-        this.applyState(thing);
+        this.applyLook(thing);
     },
 
-    changeState: function(thing, newState, ignoreSame) {
+    changeLook: function(thing, newState, ignoreSame) {
         if (ignoreSame && thing.stateName == newState) {
             return;
         }
-        if (!thing.state) {
-            throw new Error('cannot changeState of empty state')
+        if (!thing.look) {
+            throw new Error('cannot changeLook of empty look')
             return;
         }
-        var state = this.opts.stateBuilder.makeState(thing.plan, newState, thing.state);
-        for (var i in thing.state.nodes) {
-            var node = thing.state.nodes[i];
+        var look = this.opts.lookBuilder.makeLook(thing.plan, newState, thing.look);
+        for (var i in thing.look.nodes) {
+            var node = thing.look.nodes[i];
             if (node.inherited) {
                 node.inherited = false;
             } else {
                 if (node.plan && node.plan.type == "container") {
-                    state.nodes[i] = node;
+                    look.nodes[i] = node;
                 } else {
                     node.removeFromParent();
                 }
             }
         }
-        thing.state = state;
+        thing.look = look;
         thing.stateName = newState;
-        this.applyState(thing);
+        this.applyLook(thing);
     },
 
     syncNodeFromThing: function(node, thing) {
@@ -176,10 +175,12 @@ var ModuleCocos = ModuleAbstract.extend({
         }
     },
 
-    syncStateFromThing: function(thing) {
-        if (!thing.state) return;
-        for (var i in thing.state.nodes) {
-            this.syncNodeFromThing(thing.state.nodes[i], thing);
+    syncLookFromThing: function(thing) {
+        if (!thing.look) {
+            return;
+        }
+        for (var i in thing.look.nodes) {
+            this.syncNodeFromThing(thing.look.nodes[i], thing);
         }
     },
 
@@ -190,19 +191,23 @@ var ModuleCocos = ModuleAbstract.extend({
             }
         }
 
-        if (!thing.state) return;
-        for (var i in thing.state.nodes) {
-            delete thing.state.nodes[i].backlink;
-            thing.state.nodes[i].removeFromParent();
+        if (!thing.look) {
+            return;
         }
-        thing.state = null;
+        for (var i in thing.look.nodes) {
+            delete thing.look.nodes[i].backlink;
+            thing.look.nodes[i].removeFromParent();
+        }
+        thing.look = null;
     },
 
     //////////// EVENTS
 
     onInjectThing: function(event) {
         thing = event.thing;
-        if (!thing.plan || !thing.plan.states) return;
+        if (!thing.plan || !thing.plan.states) {
+            return;
+        }
         this.envision(thing);
     },
 
@@ -211,14 +216,14 @@ var ModuleCocos = ModuleAbstract.extend({
     },
 
     onMoveThing: function(event) {
-        this.syncStateFromThing(event.thing);
+        this.syncLookFromThing(event.thing);
     },
 
     onLoopEnd: function(event) {
         for (var i = 0; i < this.fe.field.things.length; i++) {
             thing = this.fe.field.things[i];
-            if (!thing.state || (thing.plan.static && !thing.plan.elevated)) continue;
-            this.syncStateFromThing(thing);
+            if (!thing.look || (thing.plan.static && !thing.plan.elevated)) continue;
+            this.syncLookFromThing(thing);
         }
     },
 });

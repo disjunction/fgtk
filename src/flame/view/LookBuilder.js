@@ -11,11 +11,11 @@ var cc = require('cc'),
  * * config
  * @param opts
   */
-var StateBuilder = function(opts) {
+var LookBuilder = function(opts) {
     this.opts = opts || {};
 };
 
-var _p = StateBuilder.prototype;
+var _p = LookBuilder.prototype;
 
 _p.inlcudeNodePlans = function(targetPlan, includeTo, includeDef, stateName) {
     var i;
@@ -29,9 +29,9 @@ _p.inlcudeNodePlans = function(targetPlan, includeTo, includeDef, stateName) {
 
     var plan = includeDef.planSrc ? this.opts.nb.opts.cosmosManager.get(includeDef.planSrc) : targetPlan,
         includeState = includeDef.state || stateName,
-        state = this.makeState(plan, includeState);
-    for (i in state.nodes) {
-        includeTo.nodes[i] = state.nodes[i];
+        look = this.makeLook(plan, includeState);
+    for (i in look.nodes) {
+        includeTo.nodes[i] = look.nodes[i];
     }
 };
 
@@ -39,11 +39,11 @@ _p.inlcudeNodePlans = function(targetPlan, includeTo, includeDef, stateName) {
  * FIXME i'm so ugly! decompose me pls!!!
  * @param  {plan} thingPlan
  * @param  {string} stateName
- * @param  {Object} parentState
- * @return {state}
+ * @param  {Object} parentLook
+ * @return {look}
  */
-_p.makeState = function(thingPlan, stateName, parentState) {
-    var state = {nodes: {}};
+_p.makeLook = function(thingPlan, stateName, parentLook) {
+    var look = {nodes: {}};
     if (!thingPlan.states[stateName]) {
         throw new Error('unknown state "' + stateName + '"');
     }
@@ -54,7 +54,7 @@ _p.makeState = function(thingPlan, stateName, parentState) {
             continue;
         }
         if (i == '$include') {
-            this.inlcudeNodePlans(thingPlan, state, thingPlan.states[stateName][i], stateName);
+            this.inlcudeNodePlans(thingPlan, look, thingPlan.states[stateName][i], stateName);
             continue;
         }
 
@@ -72,8 +72,8 @@ _p.makeState = function(thingPlan, stateName, parentState) {
         newNodePlan.name = i;
 
         if (newNodePlan.inherit) {
-            if (parentState && parentState.nodes[newNodePlan.inherit]) {
-                node = parentState.nodes[newNodePlan.inherit];
+            if (parentLook && parentLook.nodes[newNodePlan.inherit]) {
+                node = parentLook.nodes[newNodePlan.inherit];
 
                 if (node.currentAction && node.compiledAni) {
                     // stopping animation on a detatched node produces fatal in cocos
@@ -113,11 +113,11 @@ _p.makeState = function(thingPlan, stateName, parentState) {
             thingPlan.elevated = true;
         }
 
-        state.nodes[i] = node;
+        look.nodes[i] = node;
     }
-    state.name = stateName;
-    return state;
+    look.name = stateName;
+    return look;
 };
 
 
-module.exports = StateBuilder;
+module.exports = LookBuilder;

@@ -66,13 +66,13 @@ var Thing = cc.Class.extend({
  * @returns {Node}
  */
 Thing.getPrimaryNode = function(thing) {
-    if (thing.state.nodes.primary) {
-        return thing.state.nodes.primary;
+    if (thing.look.nodes.primary) {
+        return thing.look.nodes.primary;
     }
 
     // ugly - getting the first node
-    for (var i in thing.state.nodes) {
-        return thing.state.nodes[i];
+    for (var i in thing.look.nodes) {
+        return thing.look.nodes[i];
     }
 
     return null;
